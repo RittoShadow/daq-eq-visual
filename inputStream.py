@@ -28,7 +28,7 @@ import time
 dataBuffer = [[],[],[],[]]
 subBuffer = [[],[],[],[]]
 bufferSize = 5000
-windowSize = 1000
+windowSize = 2500
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
 mutex = Condition()
@@ -63,17 +63,30 @@ def animate(e):
     yar1 = dataBuffer[1][start:finish]
     yar2 = dataBuffer[2][start:finish]
     yar3 = dataBuffer[3][start:finish]
-    if i > j:
+    if start > finish:
         xar = dataBuffer[0][start:] + dataBuffer[0][:finish]
         yar1 = dataBuffer[1][start:] + dataBuffer[1][:finish]
         yar2 = dataBuffer[2][start:] + dataBuffer[2][:finish]
         yar3 = dataBuffer[3][start:] + dataBuffer[3][:finish]
-    ax1.clear()
-    plt.xlim([min(xar),max(xar)])
-    plt.ylim([min(yar1),max(yar1)])
-    ax1.plot(xar,yar1,'-',linewidth=0.3)
-    ax1.plot(xar,yar2,'r-',linewidth=0.3)
-    ax1.plot(xar,yar3,'g-',linewidth=0.3)
+        thresh = max([max(yar1),max(yar2),max(yar3)])
+        ax1.clear()
+        plt.xlim([min(xar),max(xar)])
+        plt.ylim([-thresh,thresh])
+        ax1.plot(xar,yar1,'-',linewidth=0.3)
+        ax1.plot(xar,yar2,'r-',linewidth=0.3)
+        ax1.plot(xar,yar3,'g-',linewidth=0.3)
+    else:
+        xar = dataBuffer[0][start:finish]
+        yar1 = dataBuffer[1][start:finish]
+        yar2 = dataBuffer[2][start:finish]
+        yar3 = dataBuffer[3][start:finish]
+        thresh = max([max(yar1),max(yar2),max(yar3)])
+        ax1.clear()
+        plt.xlim([min(xar),max(xar)])
+        plt.ylim([-thresh,thresh])
+        ax1.plot(xar,yar1,'-',linewidth=0.3)
+        ax1.plot(xar,yar2,'r-',linewidth=0.3)
+        ax1.plot(xar,yar3,'g-',linewidth=0.3)
     #mutex.notify()
     #mutex.release()
 
@@ -184,7 +197,7 @@ else:
 
 print("Press Enter to quit....")
 
-ani = animation.FuncAnimation(fig, animate, interval=100)
+ani = animation.FuncAnimation(fig, animate, interval=1000)
 plt.show()
 
 while True:
