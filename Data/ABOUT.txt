@@ -1,0 +1,9 @@
+testData.txt -> Archivo de prueba para probar funcionamiento de script de visualización.
+testdata3.txt -> Archivo de datos de 2 sensores conectados directamente a la SBC. Tasa de adquisición alta.
+testdata4.txt -> Archivo de datos de 4 sensores conectados directamente a la SBC. Tasa de adquisición baja. Experimento hecho para medir peso de archivo para una sesión de 30 min.
+datatest8.txt -> Archivos de datos de 2 sensores conectados a un hub USB conectado a la SBC. Tasa de adquisición alta.
+datatest9.txt -> Archivos de datos de 3 sensores conectados a un hub USB conectado a la SBC. Tasa de adquisición alta.
+datatest10.txt -> Archivos de datos de 4 sensores conectados a un hub USB conectado a la SBC. Tasa de adquisición alta.
+datatest11.txt -> Archivos de datos de 4 sensores conectados a un hub USB conectado a la SBC. Tasa de adquisición alta. 2 de los sensores son distintos a los usados anteriormente.
+datatest12.txt -> Prueba con 5 sensores en computador. Los 5 sensores están conectados al hub USB.
+datatest13.txt -> Prueba con 6 sensores en computador. 4 sensores conectados al hub USB y los otros directamente al computador.
