@@ -29,7 +29,7 @@ import time
 dataBuffer = [[],[],[],[]]
 subBuffer = [[],[],[],[]]
 bufferSize = 5000
-windowSize = 2500
+windowSize = 1000
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
 mutex = Condition()
@@ -55,7 +55,7 @@ except PhidgetException as e:
     exit(1)
 
 def animate(e):
-    global dataBuffers, subBuffer, writing, i, j
+    global dataBuffers, indexes
     dataBuffer = dataBuffers[dataBuffers.keys()[0]]
     if len(dataBuffer[0]) < windowSize:
         return
@@ -64,12 +64,8 @@ def animate(e):
     #     mutex.wait()
     # transferToBuffer(dataBuffer,subBuffer)
     # subBuffer = [[],[],[],[]]
-    start = i
-    finish = (i+windowSize)%bufferSize
-    xar = dataBuffer[0][start:finish]
-    yar1 = dataBuffer[1][start:finish]
-    yar2 = dataBuffer[2][start:finish]
-    yar3 = dataBuffer[3][start:finish]
+    start = indexes[indexes.keys()[0]]
+    finish = (start+windowSize)%bufferSize
     if start > finish:
         xar = dataBuffer[0][start:] + dataBuffer[0][:finish]
         yar1 = dataBuffer[1][start:] + dataBuffer[1][:finish]
@@ -126,12 +122,15 @@ def SpatialError(e):
 
 
 def SpatialData(e):
-    global dataBuffers, subBuffer, writing, i, j
+    global dataBuffers, indexes
     source = e.device
-    dataBuffer = dataBuffers[source.getSerialNum()]
+    serialNum = source.getSerialNum()
+    dataBuffer = dataBuffers[serialNum]
+
     #print("Spatial %i: Amount of data %i" % (source.getSerialNum(), len(e.spatialData)))
     for index, spatialData in enumerate(e.spatialData):
         #print("=== Data Set: %i ===" % (index))
+        i = indexes[serialNum]
         if len(spatialData.Acceleration) > 0:
             #print("Acceleration> x: %6f  y: %6f  z: %6f" % (spatialData.Acceleration[0], spatialData.Acceleration[1], spatialData.Acceleration[2]))
             x = spatialData.Acceleration[0]
@@ -148,16 +147,16 @@ def SpatialData(e):
             #     #mutex.release()
             # else:
             if len(dataBuffer[0]) < bufferSize:
-                dataBuffer[0].append(ts)
-                dataBuffer[1].append(x)
-                dataBuffer[2].append(y)
-                dataBuffer[3].append(z)
+                dataBuffers[serialNum][0].append(ts)
+                dataBuffers[serialNum][1].append(x)
+                dataBuffers[serialNum][2].append(y)
+                dataBuffers[serialNum][3].append(z)
             else:
-                dataBuffer[0][i] = ts
-                dataBuffer[1][i] = x
-                dataBuffer[2][i] = y
-                dataBuffer[3][i] = z
-                i = (i+1)%bufferSize
+                dataBuffers[serialNum][0][i] = ts
+                dataBuffers[serialNum][1][i] = x
+                dataBuffers[serialNum][2][i] = y
+                dataBuffers[serialNum][3][i] = z
+                indexes[serialNum] = (i+1)%bufferSize
 
 
 
@@ -171,12 +170,14 @@ print("Opening phidget object....")
 
 numDevices = len(manager.getAttachedDevices())
 dataBuffers = {}
+indexes = {}
 
 for device in manager.getAttachedDevices():
     try:
         spatial = Spatial()
         spatial.openPhidget(device.getSerialNum())
         dataBuffers[device.getSerialNum()] = [[],[],[],[]]
+        indexes[device.getSerialNum()] = 0
         spatial.setOnAttachHandler(SpatialAttached)
         spatial.setOnDetachHandler(SpatialDetached)
         spatial.setOnErrorhandler(SpatialError)
