@@ -22,6 +22,7 @@ from Phidgets.Events.Events import SpatialDataEventArgs, AttachEventArgs, Detach
 from Phidgets.Devices.Spatial import Spatial, SpatialEventData, TimeSpan
 from Phidgets.Phidget import PhidgetLogLevel
 from threading import Condition
+from SensorParams import *
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import time
@@ -31,7 +32,8 @@ subBuffer = [[],[],[],[]]
 bufferSize = 5000
 windowSize = 1000
 fig = plt.figure()
-ax1 = fig.add_subplot(1,1,1)
+ax1 = fig.add_subplot(2,1,1)
+ax2 = fig.add_subplot(2,1,2)
 mutex = Condition()
 i = 0
 j = windowSize
@@ -54,42 +56,23 @@ except PhidgetException as e:
     print ("Exiting")
     exit(1)
 
-def animate(e):
-    global dataBuffers, indexes
-    dataBuffer = dataBuffers[dataBuffers.keys()[0]]
-    if len(dataBuffer[0]) < windowSize:
+def animate(e, serialNum):
+    global params
+    param = params[serialNum]
+    if len(param.getTimestamp()) < windowSize:
         return
     #mutex.acquire()
     # while len(dataBuffer[0]) < bufferSize or len(subBuffer[0]) < windowSize:
     #     mutex.wait()
     # transferToBuffer(dataBuffer,subBuffer)
     # subBuffer = [[],[],[],[]]
-    start = indexes[indexes.keys()[0]]
-    finish = (start+windowSize)%bufferSize
-    if start > finish:
-        xar = dataBuffer[0][start:] + dataBuffer[0][:finish]
-        yar1 = dataBuffer[1][start:] + dataBuffer[1][:finish]
-        yar2 = dataBuffer[2][start:] + dataBuffer[2][:finish]
-        yar3 = dataBuffer[3][start:] + dataBuffer[3][:finish]
-        thresh = max([max(yar1),max(yar2),max(yar3)])
-        ax1.clear()
-        plt.xlim([min(xar),max(xar)])
-        plt.ylim([-thresh,thresh])
-        ax1.plot(xar,yar1,'-',linewidth=0.3)
-        ax1.plot(xar,yar2,'r-',linewidth=0.3)
-        ax1.plot(xar,yar3,'g-',linewidth=0.3)
-    else:
-        xar = dataBuffer[0][start:finish]
-        yar1 = dataBuffer[1][start:finish]
-        yar2 = dataBuffer[2][start:finish]
-        yar3 = dataBuffer[3][start:finish]
-        thresh = max([max(yar1),max(yar2),max(yar3)])
-        ax1.clear()
-        plt.xlim([min(xar),max(xar)])
-        plt.ylim([-thresh,thresh])
-        ax1.plot(xar,yar1,'-',linewidth=0.3)
-        ax1.plot(xar,yar2,'r-',linewidth=0.3)
-        ax1.plot(xar,yar3,'g-',linewidth=0.3)
+    [xar,yar1,yar2,yar3,thresh] = param.getPlotData()
+    param.getSubplot().clear()
+    param.getSubplot().set_xlim([min(xar),max(xar)])
+    param.getSubplot().set_ylim([-thresh,thresh])
+    param.getSubplot().plot(xar,yar1,'b-',linewidth=0.3)
+    param.getSubplot().plot(xar,yar2,'r-',linewidth=0.3)
+    param.getSubplot().plot(xar,yar3,'g-',linewidth=0.3)
     #mutex.notify()
     #mutex.release()
 
@@ -125,12 +108,12 @@ def SpatialData(e):
     global dataBuffers, indexes
     source = e.device
     serialNum = source.getSerialNum()
-    dataBuffer = dataBuffers[serialNum]
+    param = params[serialNum]
 
     #print("Spatial %i: Amount of data %i" % (source.getSerialNum(), len(e.spatialData)))
     for index, spatialData in enumerate(e.spatialData):
         #print("=== Data Set: %i ===" % (index))
-        i = indexes[serialNum]
+        i = param.getIndex()
         if len(spatialData.Acceleration) > 0:
             #print("Acceleration> x: %6f  y: %6f  z: %6f" % (spatialData.Acceleration[0], spatialData.Acceleration[1], spatialData.Acceleration[2]))
             x = spatialData.Acceleration[0]
@@ -146,17 +129,9 @@ def SpatialData(e):
             #     #mutex.notify()
             #     #mutex.release()
             # else:
-            if len(dataBuffer[0]) < bufferSize:
-                dataBuffers[serialNum][0].append(ts)
-                dataBuffers[serialNum][1].append(x)
-                dataBuffers[serialNum][2].append(y)
-                dataBuffers[serialNum][3].append(z)
-            else:
-                dataBuffers[serialNum][0][i] = ts
-                dataBuffers[serialNum][1][i] = x
-                dataBuffers[serialNum][2][i] = y
-                dataBuffers[serialNum][3][i] = z
-                indexes[serialNum] = (i+1)%bufferSize
+            param.appendData(ts,x,y,z)
+            if len(param.getTimestamp()) == bufferSize:
+                param.addIndex()
 
 
 
@@ -169,15 +144,16 @@ def SpatialData(e):
 print("Opening phidget object....")
 
 numDevices = len(manager.getAttachedDevices())
-dataBuffers = {}
-indexes = {}
+params = {}
 
 for device in manager.getAttachedDevices():
     try:
         spatial = Spatial()
         spatial.openPhidget(device.getSerialNum())
-        dataBuffers[device.getSerialNum()] = [[],[],[],[]]
-        indexes[device.getSerialNum()] = 0
+        sensor = SensorParams(device.getSerialNum())
+        sensor.setBufferSize(bufferSize)
+        sensor.setWindowSize(windowSize)
+        params[device.getSerialNum()] = sensor
         spatial.setOnAttachHandler(SpatialAttached)
         spatial.setOnDetachHandler(SpatialDetached)
         spatial.setOnErrorhandler(SpatialError)
@@ -208,7 +184,15 @@ for device in manager.getAttachedDevices():
 
 print("Press Enter to quit....")
 
-ani = animation.FuncAnimation(fig, animate, interval=1000)
+n = 1
+
+ani = []
+
+for j in params:
+    params[j].axis = fig.add_subplot(numDevices,1,n)
+    ani.append(animation.FuncAnimation(fig, animate, fargs = (j,), interval=1000))
+    n = n + 1
+
 plt.show()
 
 while True:
@@ -218,9 +202,6 @@ while True:
 
 
 print("Closing...")
-
-for phidget in manager.getAttachedDevices():
-    print phidget.getSerialNum()
 
 try:
     spatial.closePhidget()
