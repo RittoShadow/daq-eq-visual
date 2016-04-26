@@ -16,6 +16,7 @@ import Tkinter as tk
 import numpy as np
 #Phidget specific imports
 from Phidgets.Phidget import Phidget
+from Phidgets.Manager import Manager
 from Phidgets.PhidgetException import PhidgetErrorCodes, PhidgetException
 from Phidgets.Events.Events import SpatialDataEventArgs, AttachEventArgs, DetachEventArgs, ErrorEventArgs
 from Phidgets.Devices.Spatial import Spatial, SpatialEventData, TimeSpan
@@ -35,21 +36,27 @@ mutex = Condition()
 i = 0
 j = windowSize
 
+spatialList = []
+
 #Create an accelerometer object
+# try:
+#     spatial = Spatial()
+# except RuntimeError as e:
+#     print("Runtime Exception: %s" % e.details)
+#     print("Exiting....")
+#     exit(1)
+
 try:
-    spatial = Spatial()
-except RuntimeError as e:
-    print("Runtime Exception: %s" % e.details)
-    print("Exiting....")
+    manager = Manager()
+    manager.openManager()
+except PhidgetException as e:
+    print ("PhidgetException: %s" % e.details)
+    print ("Exiting")
     exit(1)
 
-def transferToBuffer(buff, sub):
-    for i in range (len(buff)):
-        buff[i] = buff[i] + sub[i]
-        buff[i] = buff[i][len(sub[i]):]
-
 def animate(e):
-    global dataBuffer, subBuffer, writing, i, j
+    global dataBuffers, subBuffer, writing, i, j
+    dataBuffer = dataBuffers[dataBuffers.keys()[0]]
     if len(dataBuffer[0]) < windowSize:
         return
     #mutex.acquire()
@@ -117,9 +124,11 @@ def SpatialError(e):
     except PhidgetException as e:
         print("Phidget Exception %i: %s" % (e.code, e.details))
 
+
 def SpatialData(e):
-    global dataBuffer, subBuffer, writing, i, j
+    global dataBuffers, subBuffer, writing, i, j
     source = e.device
+    dataBuffer = dataBuffers[source.getSerialNum()]
     #print("Spatial %i: Amount of data %i" % (source.getSerialNum(), len(e.spatialData)))
     for index, spatialData in enumerate(e.spatialData):
         #print("=== Data Set: %i ===" % (index))
@@ -155,45 +164,46 @@ def SpatialData(e):
     #print("------------------------------------------")
 
 #Main Program Code
-try:
 	#logging example, uncomment to generate a log file
     #spatial.enableLogging(PhidgetLogLevel.PHIDGET_LOG_VERBOSE, "phidgetlog.log")
 
-    spatial.setOnAttachHandler(SpatialAttached)
-    spatial.setOnDetachHandler(SpatialDetached)
-    spatial.setOnErrorhandler(SpatialError)
-    spatial.setOnSpatialDataHandler(SpatialData)
-except PhidgetException as e:
-    print("Phidget Exception %i: %s" % (e.code, e.details))
-    print("Exiting....")
-    exit(1)
-
 print("Opening phidget object....")
 
-try:
-    spatial.openPhidget()
-except PhidgetException as e:
-    print("Phidget Exception %i: %s" % (e.code, e.details))
-    print("Exiting....")
-    exit(1)
+numDevices = len(manager.getAttachedDevices())
+dataBuffers = {}
 
-print("Waiting for attach....")
-
-try:
-    spatial.waitForAttach(10000)
-except PhidgetException as e:
-    print("Phidget Exception %i: %s" % (e.code, e.details))
+for device in manager.getAttachedDevices():
     try:
-        spatial.closePhidget()
+        spatial = Spatial()
+        spatial.openPhidget(device.getSerialNum())
+        dataBuffers[device.getSerialNum()] = [[],[],[],[]]
+        spatial.setOnAttachHandler(SpatialAttached)
+        spatial.setOnDetachHandler(SpatialDetached)
+        spatial.setOnErrorhandler(SpatialError)
+        spatial.setOnSpatialDataHandler(SpatialData)
     except PhidgetException as e:
         print("Phidget Exception %i: %s" % (e.code, e.details))
         print("Exiting....")
         exit(1)
-    print("Exiting....")
-    exit(1)
-else:
-    spatial.setDataRate(1)
-    DisplayDeviceInfo()
+
+    print("Waiting for attach....")
+
+    try:
+        spatial.waitForAttach(10000)
+    except PhidgetException as e:
+        print("Phidget Exception %i: %s" % (e.code, e.details))
+        try:
+            spatial.closePhidget()
+            phidgetList = manager.getPhidgets()
+        except PhidgetException as e:
+            print("Phidget Exception %i: %s" % (e.code, e.details))
+            print("Exiting....")
+            exit(1)
+        print("Exiting....")
+        exit(1)
+    else:
+        spatial.setDataRate(1)
+        DisplayDeviceInfo()
 
 print("Press Enter to quit....")
 
@@ -207,6 +217,9 @@ while True:
 
 
 print("Closing...")
+
+for phidget in manager.getAttachedDevices():
+    print phidget.getSerialNum()
 
 try:
     spatial.closePhidget()
