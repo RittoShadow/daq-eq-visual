@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-import socket
+from django_socketio.events import *
 from plot import staticPlot
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
@@ -15,9 +15,7 @@ def formatData(request):
 	response = HttpResponse(content_type='image/png')
 	canvas.print_png(response)
 	figure.clear()
-	rendered = render_to_string('plot/index.html',{ "graph" : response})
-	return rendered
-
+	return render(request, 'plot/index.html',{ graph : response})
 
 def parse(filePath):
     f = open(filePath,'r')
