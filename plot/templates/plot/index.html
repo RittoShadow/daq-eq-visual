@@ -1,3 +1,19 @@
-<body>
+<!DOCTYPE html>
+<head>
+  <script>
+  var socket = new io.Socket();
+  socket.connect();
+  socket.on(connect, function() {
+    socket.subscribe(my channel);
+    });
+  </script>
 
+<title>{{ page_title }}</title>
+<!-- etc. -->
+</head>
+<body>
+  <div>
+    {{ graph }}
+  </div>
 </body>
+</html>
