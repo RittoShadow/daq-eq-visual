@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <head>
-  {% load socketio_tags %}
+  <!--{% load socketio_tags %}-->
   {% socketio %}
+  {% load staticfiles %}
+  <script src="{% static "plot/js/daqeq.js" %}"></script>
 
 <title>{{ page_title }}</title>
 <!-- etc. -->
@@ -10,6 +12,10 @@
   <div>
     {{ graph }}
   </div>
-  <input type="button" onclick="message">
+  <form action="/plot/graph/" method="post">
+  {% csrf_token %}
+    <input type="hidden" id="buffer" name="buffer" value="{% static "plot/testFinal.txt" %}">
+    <input type="submit" value="Plot">
+  </form>
 </body>
 </html>

@@ -5,9 +5,61 @@ A Line object's ``set_dashes`` method allows you to specify dashes with
 a series of on/off lengths (in points).
 """
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
 from main import *
+from sys import *
+
+def parse(filePath):
+    print os.path.dirname(__file__)+filePath
+    f = open(os.path.dirname(__file__)+filePath,'r')
+    n = 0
+    epoch = 0
+    #Find when data begins
+    for line in f:
+        match = re.search("%-*DATA-*",line)
+        if match:
+            #When the data is found, we want to know how many sensors were used
+            data = next(f).split(";")
+            d = (len(data)-2)/3.0
+            if not (d.is_integer()):
+                print "Invalid data file"
+            else:
+                n = int(d)
+                epoch = float(data[0])
+            break
+        else:
+            continue
+    #Given the number of sensors 'n' we can initialize our variables
+    timeStamps = []
+    xAxis = [[] for i in range(n)]
+    yAxis = [[] for i in range(n)]
+    zAxis = [[] for i in range(n)]
+
+    #We proceed from the first data line
+    for line in f:
+        data = line.split(";")
+        if (len(data)-2)/3 == n:
+            #Cast from string to float
+            data = map((lambda p: float(p)), data[:len(data)-1])
+            timeStamps.append(data[0]-epoch)
+            for i in range(0, n):
+                xAxis[i].append(data[i+1])
+                yAxis[i].append(data[i+2])
+                zAxis[i].append(data[i+3])
+        else:
+            print "Invalid data file 2"
+            break
+    #We need the return, so we craft it using append
+    dataCollection = [timeStamps]
+    for i in range(0, n):
+        dataCollection.append(xAxis[i])
+        dataCollection.append(yAxis[i])
+        dataCollection.append(zAxis[i])
+    return dataCollection
+
 
 def staticPlot(dataCollection):
     numSensors = (len(dataCollection)-1)/3
