@@ -37,8 +37,8 @@ var disconnect = function(){
   socket.send({ action : stop })
 };
 
-var receiveData = function(data){
-
+var receiveData = function(){
+	socket.send({ action : send })
 }
 
 var start = function(){

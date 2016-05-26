@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <head>
-  {% load socketio_tags %}
+  <!--{% load socketio_tags %}-->
   {% socketio %}
-
-<title>{{ page_title }}</title>
+  <script src="{{STATIC_URL}}js/daqeq.js" type='text/javascript'></script>
+<title></title>
 <!-- etc. -->
 </head>
 <body>
   <div>
-    {{ graph }}
+    <form action='/plot/graph/' method="post">
+    {% csrf_token %}
+    {% if buffer %}
+    <select name="to_plot">
+      {% for b in buffer %}
+        <option value='{{b}}'>{{b}}</option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="Plot">
+    {% endif %}
+    </form>
+    {% if plot %}
+	<img src="/plot/result/"  />
+	<input type="hidden" name="data" value="{{ data }}">
+    {% else %}
+	Nothing to show here
+    {% endif %}
   </div>
-  <input type="button" onclick="message">
 </body>
 </html>
