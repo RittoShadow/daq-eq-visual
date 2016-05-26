@@ -1,6 +1,51 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.forms import ModelForm
+
+class Configuration(models.Model):
+    graphWindow = models.IntegerField(default=5)
+    filterWindow = models.IntegerField(default=10)
+    preEventTime = models.IntegerField(default=10)
+    postEventTime = models.IntegerField(default=10)
+    minTimeRunning = models.IntegerField(default=20)
+    votes = models.IntegerField(default=1)
+    enableRegistry = models.BooleanField(default=False)
+    recordLength = models.IntegerField(default=900)
+    filenameFormat = models.CharField(max_length=50)
+    enableTrigger = models.BooleanField(default=False)
+    serverURL = models.URLField()
+    portNumber = models.IntegerField()
+    networkName = models.CharField(max_length=50)
+    enableAutoStart = models.BooleanField()
+    outputDir = models.FilePathField()
+
+    def __save__(self):
+        self.save()
+        createConfigFile()
+
+class Notification(models.Model):
+    username = models.CharField(max_length=20)
+    password = models.CharField(max_length=20)
+    structure = models.CharField(max_length=10)
+    email = models.EmailField(max_length=50)
+    phoneNumber = models.CharField(max_length=15)
+    sendSMS = models.BooleanField()
+    sendRecord = models.BooleanField()
+    compressRegistry = models.BooleanField()
+    authenticationURL = models.CharField(max_length=50)
+    recordURL = models.URLField()
+    sendStructHealth = models.BooleanField()
+    structHealthURL = models.URLField()
+    sendFrequency = models.IntegerField()
+    verificationFrequency = models.IntegerField()
+
+class configForm(ModelForm):
+    class Meta:
+        model = Configuration
+        fields = ['graphWindow','filterWindow','preEventTime','postEventTime','minTimeRunning','votes','enableRegistry','registryLength','filenameFormat','enableTrigger','serverURL','portNumber','enableAutoStart','outputDir']
+
+
 
 class SensorParams(models.Model):
     def __init__(self, serialNum):

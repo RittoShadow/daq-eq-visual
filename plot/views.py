@@ -32,11 +32,11 @@ def formatData(request):
 			return render(request, 'plot/index.html', { "graph" : "Something to show, but no" , "file" : files[-1] })
 	else:
 		return render(request, 'plot/index.html',{ "graph" : "Nothing to show"})
-		
+
 def subscribe(request):
 	ip = net.ifaddresses('eth0')[2][0]['addr']
 	return render(request, 'plot/plot.html', { "ip" : ip })
-	
+
 def newPlot(request):
 	data = None
 	if request.method == "GET":
@@ -50,3 +50,10 @@ def newPlot(request):
 	figure.close()
 	return response
 
+def config(request):
+	if request.method == "POST":
+		if request.POST['']
+		return request
+	else:
+		configData = parseConfigFile()
+		return render(request, 'plot/config.html', { "sensors" : configData })

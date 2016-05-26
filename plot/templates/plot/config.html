@@ -22,43 +22,45 @@ function enable(){
 </head>
 <body>
   {% csrf_token %}
-  <div style="position:relative">
+  <div style="position:relative, height:100%">
     <form action='/plot/graph/' method="post">
-      <div style="float:left">
-      <h4>Parametros generales</h4>
-      <ul>
-        <li>Ventana de gráfico:<input type="number" name="graphWindow"></li>
-        <li>Ventana de filtro:<input type="number" name="filterWindow"></li>
-        <li>Pre-evento:<input type="number" name="preEvent"></li>
-        <li>Post-evento:<input type="number" name="postEvento"></li>
-        <li>Minimum Time Running:<input type="number" name="minRunTime"></li>
-        <li>Votos:<input type="number" name="votes"></li>
-      </ul>
-      <h4>Continuo</h4>
-      <ul>
-        <li>Habilitar registro<input type="checkbox" name="isRegistry"></li>
-        <li>Duración registro:<input type="number" name="registryDuration"></li>
-        <li>Formato nombre archivo:<input type="text" name="filenameFormat"></li>
-      </ul>
-      <h4>Trigger Externo</h4>
-      <ul>
-        <li>Habilitar trigger externo<input type="checkbox" name="isExternal"></li>
-        <li>URL Servidor:<input type="text" name="serverURL"></li>
-        <li>Puerto:<input type="number" name="serverPort"></li>
-        <li>Nombre de Red:<input type="text" name="networkName"></li>
-      </ul>
-    </div>
+      <div style="margin:auto; position:relative">
+        <h4>Parametros generales</h4>
+        <ul>
+          <li>Ventana de gráfico:<input type="number" name="graphWindow" value={% if graphWindow %} {{graphWindow}} {% else %} 20 {% endif %}></li>
+          <li>Ventana de filtro:<input type="number" name="filterWindow" value={% if filterWindow %} {{filterWindow}} {% else %} 20 {% endif %}></li>
+          <li>Pre-evento:<input type="number" name="preEvent" value={% if preEvent %} {{preEvent}} {% else %} 20 {% endif %}></li>
+          <li>Post-evento:<input type="number" name="postEvent" value={% if postEvent %} {{postEvent}} {% else %} 20 {% endif %}></li>
+          <li>Minimum Time Running:<input type="number" name="minRunTime" value={% if minRunTime %} {{minRunTime}} {% else %} 40 {% endif %}></li>
+          <li>Votos:<input type="number" name="votes" value={% if votes %} {{votes}} {% else %} 1 {% endif %}></li>
+        </ul>
+        <h4>Continuo</h4>
+        <ul>
+          <li>Habilitar registro<input type="checkbox" name="isRecording"></li>
+          <li>Duración registro:<input type="number" name="recordDuration" value={% if recordDuration %} {{recordDuration}} {% else %} 900 {% endif %}></li>
+          <li>Formato nombre archivo:<input type="text" name="filenameFormat" value='{% if filenameFormat %} {{filenameFormat}} {% else %} lol {% endif %}'></li>
+        </ul>
+        <h4>Trigger Externo</h4>
+        <ul>
+          <li>Habilitar trigger externo<input type="checkbox" name="isExternal"></li>
+          <li>URL Servidor:<input type="text" name="serverURL" value='{% if serverURL %} {{serverURL}} {% else %} localhost {% endif %}'></li>
+          <li>Puerto:<input type="number" name="serverPort" value={% if serverPort %} {{serverPort}} {% else %} 7256 {% endif %}></li>
+          <li>Nombre de Red:<input type="text" name="networkName" value='{% if networkName %} {{networkName}} {% else %} localhost {% endif %}'></li>
+        </ul>
+      </div>
       <div style="margin:auto; position:absolute; top:0px; right:0px">
-        <br>Iniciar automáticamente<input type="checkbox" name="autoInit">
-        <br>Permitir configuración de cliente<input type="checkbox" id="check" name="allowClientConfig" onclick="enable()">
-        <br>Usuario:<input type="text" id="usr" name="username" disabled="true">
-        <br>Password:<input type="password" id="pwd" name="passwd" disabled="true">
+        <ul>
+          <li>Iniciar automáticamente<input type="checkbox" name="autoInit">
+          <li>Permitir configuración de cliente<input type="checkbox" id="check" name="allowClientConfig" onclick="enable()">
+          <li>Usuario:<input type="text" id="usr" name="username" disabled="true" value='{% if username %} {{username}} {% else %}{% endif %}'>
+          <li>Password:<input type="password" id="pwd" name="passwd" disabled="true" value='{% if passwd %} {{passwd}} {% else %}{% endif %}'>
+        </ul>
       </div>
       <br><input type="submit" value="Guardar">
     </form>
   </div>
   {% csrf_token %}
-<div style="position:absolute; bottom:0px">
+<div style="position:absolute; top:100%">
   <form>
         <b>Autenticación</b><br>
         <ul>
