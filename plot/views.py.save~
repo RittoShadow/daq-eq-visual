@@ -1,0 +1,53 @@
+from django.shortcuts import render
+from django.http import HttpResponse
+from django_socketio.events import *
+import matplotlib
+matplotlib.use('Agg')
+<<<<<<< HEAD
+import netifaces as net
+import plot
+import os
+import io
+from PIL import Image
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+
+def index(request):
+	files = sorted(map(lambda p : '/home/pi/Desktop/daqeq/trunk/enviados/'+str(p), os.listdir('/home/pi/Desktop/daqeq/trunk/enviados')), key=os.path.getctime)
+	files = files + os.listdir('/home/pi/Desktop/daqeq/trunk/')
+	files = filter(lambda p : re.search("[\w-_]+TEST[\w-_]+\.txt",p),files)
+	return render(request, "plot/index.html", { "buffer" : files })
+# Create your views here.
+
+def formatData(request):
+	if request.method == "POST":
+		buff = request.POST["buffer"]
+		if buff:
+			data = plot.parse(buff) #Suppose there's a stream of data running.
+			figure = plot.staticPlot(data)
+			canvas = FigureCanvasAgg(figure)
+			response = HttpResponse(content_type='image/png')
+			canvas.print_png(response)
+			return response
+		else:
+			files = sorted( map(lambda p : '/home/pi/Desktop/daqeq/trunk/enviados/'+str(p), os.listdir('/home/pi/Desktop/daqeq/trunk/enviados')), key=os.path.getctime)
+			return render(request, 'plot/index.html', { "graph" : "Something to show, but no" , "file" : files[-1] })
+	else:
+		return render(request, 'plot/index.html',{ "graph" : "Nothing to show"})
+		
+def subscribe(request):
+	ip = net.ifaddresses('eth0')[2][0]['addr']
+	return render(request, 'plot/plot.html', { "ip" : ip })
+	
+def newPlot(request):
+	data = None
+	if request.method == "GET":
+		data = request.GET["data"]
+	elif request.method == "POST":
+		data = request.POST["data"]
+	figure = plot.staticPlot(data)
+	canvas = FigureCanvasAgg(figure)
+	response = HttpResponse(content_type='image/png')
+	canvas.print_png(response)
+	figure.close()
+	return response
+

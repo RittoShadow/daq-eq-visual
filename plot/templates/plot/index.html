@@ -3,7 +3,10 @@
   <!--{% load socketio_tags %}-->
   {% socketio %}
   <script src="{{STATIC_URL}}js/daqeq.js" type='text/javascript'></script>
-<title></title>
+  {% load staticfiles %}
+  <script src="{% static "plot/js/daqeq.js" %}"></script>
+
+<title>{{ page_title }}</title>
 <!-- etc. -->
 </head>
 <body>
@@ -26,5 +29,10 @@
 	Nothing to show here
     {% endif %}
   </div>
+  <form action="/plot/graph/" method="post">
+  {% csrf_token %}
+    <input type="hidden" id="buffer" name="buffer" value="{% static "plot/testFinal.txt" %}">
+    <input type="submit" value="Plot">
+  </form>
 </body>
 </html>

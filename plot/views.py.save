@@ -12,13 +12,14 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 def index(request):
 	files = sorted(map(lambda p : '/home/pi/Desktop/daqeq/trunk/enviados/'+str(p), os.listdir('/home/pi/Desktop/daqeq/trunk/enviados')), key=os.path.getctime)
-	files = filter(lambda p : re.search("[\w-_]+TEST[\w-_]+\.txt"),files)
+	files = files + os.listdir('/home/pi/Desktop/daqeq/trunk/')
+	files = filter(lambda p : re.search("[\w-_]+TEST[\w-_]+\.txt",p),files)
 	return render(request, "plot/index.html", { "buffer" : files })
 # Create your views here.
 
 def formatData(request):
 	if request.method == "POST":
-		buff = request.POST["to_plot"]
+		buff = request.POST["buffer"]
 		if buff:
 			data = plot.parse(buff) #Suppose there's a stream of data running.
 			figure = plot.staticPlot(data)
@@ -48,3 +49,4 @@ def newPlot(request):
 	canvas.print_png(response)
 	figure.close()
 	return response
+

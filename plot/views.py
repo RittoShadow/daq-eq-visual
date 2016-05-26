@@ -19,7 +19,7 @@ def index(request):
 
 def formatData(request):
 	if request.method == "POST":
-		buff = request.POST["to_plot"]
+		buff = request.POST["buffer"]
 		if buff:
 			data = plot.parse(buff) #Suppose there's a stream of data running.
 			figure = plot.staticPlot(data)
@@ -49,3 +49,4 @@ def newPlot(request):
 	canvas.print_png(response)
 	figure.close()
 	return response
+
