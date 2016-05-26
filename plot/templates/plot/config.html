@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<meta charset="utf-8">
+<script type="text/javascript">
+
+function enable(){
+  var isDisabled = !document.getElementById("check").checked;
+  document.getElementById("usr").disabled = isDisabled;
+  document.getElementById("pwd").disabled = isDisabled;
+}
+
+</script>
+<head>
+  <!--{% load socketio_tags %}-->
+  {% socketio %}
+  <script src="{{STATIC_URL}}js/daqeq.js" type='text/javascript'></script>
+  {% load staticfiles %}
+  <script src="{% static "plot/js/daqeq.js" %}"></script>
+
+<title>{{ page_title }}</title>
+<!-- etc. -->
+</head>
+<body>
+  {% csrf_token %}
+  <div style="position:relative">
+    <form action='/plot/graph/' method="post">
+      <div style="float:left">
+      <h4>Parametros generales</h4>
+      <ul>
+        <li>Ventana de gráfico:<input type="number" name="graphWindow"></li>
+        <li>Ventana de filtro:<input type="number" name="filterWindow"></li>
+        <li>Pre-evento:<input type="number" name="preEvent"></li>
+        <li>Post-evento:<input type="number" name="postEvento"></li>
+        <li>Minimum Time Running:<input type="number" name="minRunTime"></li>
+        <li>Votos:<input type="number" name="votes"></li>
+      </ul>
+      <h4>Continuo</h4>
+      <ul>
+        <li>Habilitar registro<input type="checkbox" name="isRegistry"></li>
+        <li>Duración registro:<input type="number" name="registryDuration"></li>
+        <li>Formato nombre archivo:<input type="text" name="filenameFormat"></li>
+      </ul>
+      <h4>Trigger Externo</h4>
+      <ul>
+        <li>Habilitar trigger externo<input type="checkbox" name="isExternal"></li>
+        <li>URL Servidor:<input type="text" name="serverURL"></li>
+        <li>Puerto:<input type="number" name="serverPort"></li>
+        <li>Nombre de Red:<input type="text" name="networkName"></li>
+      </ul>
+    </div>
+      <div style="margin:auto; position:absolute; top:0px; right:0px">
+        <br>Iniciar automáticamente<input type="checkbox" name="autoInit">
+        <br>Permitir configuración de cliente<input type="checkbox" id="check" name="allowClientConfig" onclick="enable()">
+        <br>Usuario:<input type="text" id="usr" name="username" disabled="true">
+        <br>Password:<input type="password" id="pwd" name="passwd" disabled="true">
+      </div>
+      <br><input type="submit" value="Guardar">
+    </form>
+  </div>
+  {% csrf_token %}
+<div style="position:absolute; bottom:0px">
+  <form>
+        <b>Autenticación</b><br>
+        <ul>
+            <li>Usuario:
+            <input type="text" name="user"></li><br>
+            <li>Contraseña:
+            <input type="password" name="password"></li><br>
+            <li>Estructura:
+            <input type="text" name="struct"></li><br>
+        </ul>
+        <b>Datos de Contacto</b><br>
+        <ul>
+            <li>Email:
+            <input type="email" name="email"></li><br>
+            <li>Nº Teléfono:
+            <input type="text" name="phone"></li><br>
+            <li><input type="checkbox" name="sendSms"> Enviar SMS</li><br>
+        </ul>
+        <b>Envío de registros</b><br>
+        <ul>
+            <li><input type="checkbox" name="sendEvents"> Habilitar envío de registros de evento</li><br>
+            <li><input type="checkbox" name="sendCompressed"> Enviar registro comprimido</li><br>
+            <li>Url autenticación:
+            <input type="url" name="urlAuth"></li><br>
+            <li>Url envío de registros:
+            <input type="url" name="urlReg"></li><br>
+        </ul>
+        <b>Envío datos de salud</b><br>
+        <ul>
+            <li><input type="checkbox" name="sendHealth"> Habilitar envío de registros de salud</li><br>
+            <li>Url envío de estados de salud:
+            <input type="url" name="healthUrl"></li><br>
+            <li>Frecuencia de envío de datos de salud(en segundos):
+            <input type="number" name="healthFreq" min="0"></li><br>
+            <li>Frecuencia de verificación de datos de salud(en segundos):
+            <input type="number" name="healthVerFreq" min="0"></li><br>
+        </ul>
+        <b>Salida</b>
+        <ul>
+            <li>Directorio de salida:
+            <input type="text" name="outputDir"></li><br>
+        </ul>
+        <input type="submit" name='submit' value="Enviar">
+    </form>
+</div>
+</body>
+</html>
