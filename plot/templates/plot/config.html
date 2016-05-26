@@ -1,110 +1,135 @@
 <!DOCTYPE html>
 <html lang="es">
-<meta charset="utf-8">
-<script type="text/javascript">
+  <meta charset="utf-8">
+  <script type="text/javascript">
 
-function enable(){
-  var isDisabled = !document.getElementById("check").checked;
-  document.getElementById("usr").disabled = isDisabled;
-  document.getElementById("pwd").disabled = isDisabled;
-}
+  function enable(){
+    var isDisabled = !document.getElementById("check").checked;
+    document.getElementById("usr").disabled = isDisabled;
+    document.getElementById("pwd").disabled = isDisabled;
+  }
 
-</script>
-<head>
-  <!--{% load socketio_tags %}-->
-  {% socketio %}
-  <script src="{{STATIC_URL}}js/daqeq.js" type='text/javascript'></script>
-  {% load staticfiles %}
-  <script src="{% static "plot/js/daqeq.js" %}"></script>
+  function startDAQEQ(){
+    return true;
+  }
 
-<title>{{ page_title }}</title>
-<!-- etc. -->
-</head>
-<body>
-  {% csrf_token %}
-  <div style="position:relative, height:100%">
-    <form action='/plot/graph/' method="post">
-      <div style="margin:auto; position:relative">
-        <h4>Parametros generales</h4>
-        <ul>
-          <li>Ventana de gráfico:<input type="number" name="graphWindow" value={% if graphWindow %} {{graphWindow}} {% else %} 20 {% endif %}></li>
-          <li>Ventana de filtro:<input type="number" name="filterWindow" value={% if filterWindow %} {{filterWindow}} {% else %} 20 {% endif %}></li>
-          <li>Pre-evento:<input type="number" name="preEvent" value={% if preEvent %} {{preEvent}} {% else %} 20 {% endif %}></li>
-          <li>Post-evento:<input type="number" name="postEvent" value={% if postEvent %} {{postEvent}} {% else %} 20 {% endif %}></li>
-          <li>Minimum Time Running:<input type="number" name="minRunTime" value={% if minRunTime %} {{minRunTime}} {% else %} 40 {% endif %}></li>
-          <li>Votos:<input type="number" name="votes" value={% if votes %} {{votes}} {% else %} 1 {% endif %}></li>
-        </ul>
-        <h4>Continuo</h4>
-        <ul>
-          <li>Habilitar registro<input type="checkbox" name="isRecording"></li>
-          <li>Duración registro:<input type="number" name="recordDuration" value={% if recordDuration %} {{recordDuration}} {% else %} 900 {% endif %}></li>
-          <li>Formato nombre archivo:<input type="text" name="filenameFormat" value='{% if filenameFormat %} {{filenameFormat}} {% else %} lol {% endif %}'></li>
-        </ul>
-        <h4>Trigger Externo</h4>
-        <ul>
-          <li>Habilitar trigger externo<input type="checkbox" name="isExternal"></li>
-          <li>URL Servidor:<input type="text" name="serverURL" value='{% if serverURL %} {{serverURL}} {% else %} localhost {% endif %}'></li>
-          <li>Puerto:<input type="number" name="serverPort" value={% if serverPort %} {{serverPort}} {% else %} 7256 {% endif %}></li>
-          <li>Nombre de Red:<input type="text" name="networkName" value='{% if networkName %} {{networkName}} {% else %} localhost {% endif %}'></li>
-        </ul>
+  function stopDAQEQ(){
+    return true;
+  }
+  </script>
+  <head>
+    <!--{% load socketio_tags %}-->
+    {% socketio %}
+    <script src="{{STATIC_URL}}js/daqeq.js" type='text/javascript'></script>
+    {% load staticfiles %}
+    <script src="{% static "plot/js/daqeq.js" %}"></script>
+
+  <title>{{ page_title }}</title>
+  <!-- etc. -->
+  </head>
+  <body>
+    {% csrf_token %}
+    <form action='/plot/config/' method="post">
+      <div style="position:relative, height:100%">
+        <div style="width:50%; position:relative">
+          <h4>Parametros generales</h4>
+          <ul>
+            <li>Ventana de gráfico:<input type="number" name="graphWindow" value={% if graphWindow %} {{graphWindow}} {% else %} 20 {% endif %}></li>
+            <li>Ventana de filtro:<input type="number" name="filterWindow" value={% if filterWindow %} {{filterWindow}} {% else %} 20 {% endif %}></li>
+            <li>Pre-evento:<input type="number" name="preEvent" value={% if preEvent %} {{preEvent}} {% else %} 20 {% endif %}></li>
+            <li>Post-evento:<input type="number" name="postEvent" value={% if postEvent %} {{postEvent}} {% else %} 20 {% endif %}></li>
+            <li>Minimum Time Running:<input type="number" name="minRunTime" value={% if minRunTime %} {{minRunTime}} {% else %} 40 {% endif %}></li>
+            <li>Votos:<input type="number" name="votes" value={% if votes %} {{votes}} {% else %} 1 {% endif %}></li>
+          </ul>
+          <h4>Continuo</h4>
+          <ul>
+            <li>Habilitar registro<input type="checkbox" name="isRecording"></li>
+            <li>Duración registro:<input type="number" name="recordDuration" value={% if recordDuration %} {{recordDuration}} {% else %} 900 {% endif %}></li>
+            <li>Formato nombre archivo:<input type="text" name="filenameFormat" value='{% if filenameFormat %} {{filenameFormat}} {% else %} lol {% endif %}'></li>
+          </ul>
+          <h4>Trigger Externo</h4>
+          <ul>
+            <li>Habilitar trigger externo<input type="checkbox" name="isExternal"></li>
+            <li>URL Servidor:<input type="text" name="serverURL" value='{% if serverURL %} {{serverURL}} {% else %} localhost {% endif %}'></li>
+            <li>Puerto:<input type="number" name="serverPort" value={% if serverPort %} {{serverPort}} {% else %} 7256 {% endif %}></li>
+            <li>Nombre de Red:<input type="text" name="networkName" value='{% if networkName %} {{networkName}} {% else %} localhost {% endif %}'></li>
+          </ul>
+        </div>
+        <div style="width:50%; position:absolute; top:0px; right:0px">
+          <h4>Configuración para sensores</h4>
+          <ul>
+            <li>Iniciar automáticamente<input type="checkbox" name="autoInit">
+            <li>Permitir configuración de cliente<input type="checkbox" id="check" name="allowClientConfig" onclick="enable()">
+            <li>Usuario:<input type="text" id="usr" name="username" disabled="true" value='{% if username %} {{username}} {% else %}{% endif %}'>
+            <li>Password:<input type="password" id="pwd" name="passwd" disabled="true" value='{% if passwd %} {{passwd}} {% else %}{% endif %}'>
+          </ul>
+          <h4>Sensores detectados</h4>
+          <table>
+            <tr>
+              <th>N° de serie</th>
+              <th>Posición</th>
+              <th>Detrend</th>
+              <th>Trigger(x,y,z):</th>
+              <th>Detrigger(x,y,z):</th>
+              <th>Votos:</th>
+            </tr>
+          {% for sensor in sensores %}
+            <tr>
+              {% for param in sensor %}
+                <td>{{param}}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+          </table>
+        </div>
       </div>
-      <div style="margin:auto; position:absolute; top:0px; right:0px">
-        <ul>
-          <li>Iniciar automáticamente<input type="checkbox" name="autoInit">
-          <li>Permitir configuración de cliente<input type="checkbox" id="check" name="allowClientConfig" onclick="enable()">
-          <li>Usuario:<input type="text" id="usr" name="username" disabled="true" value='{% if username %} {{username}} {% else %}{% endif %}'>
-          <li>Password:<input type="password" id="pwd" name="passwd" disabled="true" value='{% if passwd %} {{passwd}} {% else %}{% endif %}'>
-        </ul>
-      </div>
-      <br><input type="submit" value="Guardar">
-    </form>
-  </div>
-  {% csrf_token %}
-<div style="position:absolute; top:100%">
-  <form>
-        <b>Autenticación</b><br>
+      {% csrf_token %}
+      <div style="position:absolute; top:100%">
+        <h4>Autenticación</h4>
         <ul>
             <li>Usuario:
-            <input type="text" name="user"></li><br>
+            <input type="text" name="notifyUser" value='{% if notifyUser %} {{notifyUser}} {% else %}{% endif %}'></li>
             <li>Contraseña:
-            <input type="password" name="password"></li><br>
+            <input type="password" name="notifyPassword" value='{% if notifyPassword %} {{notifyPassword}} {% else %}{% endif %}'></li>
             <li>Estructura:
-            <input type="text" name="struct"></li><br>
+            <input type="text" name="struct"></li>
         </ul>
-        <b>Datos de Contacto</b><br>
+        <h4>Datos de Contacto</h4>
         <ul>
             <li>Email:
-            <input type="email" name="email"></li><br>
+            <input type="email" name="email" value='{% if email %} {{email}} {% else %}{% endif %}'></li>
             <li>Nº Teléfono:
-            <input type="text" name="phone"></li><br>
-            <li><input type="checkbox" name="sendSms"> Enviar SMS</li><br>
+            <input type="text" name="phone" value='{% if phone %} {{phone}} {% else %}{% endif %}'></li>
+            <li>Enviar SMS <input type="checkbox" name="sendSms"></li>
         </ul>
-        <b>Envío de registros</b><br>
+        <h4>Envío de registros</h4>
         <ul>
-            <li><input type="checkbox" name="sendEvents"> Habilitar envío de registros de evento</li><br>
-            <li><input type="checkbox" name="sendCompressed"> Enviar registro comprimido</li><br>
+            <li>Habilitar envío de registros de evento <input type="checkbox" name="sendEvents"></li>
+            <li>Enviar registro comprimido <input type="checkbox" name="sendCompressed"></li>
             <li>Url autenticación:
-            <input type="url" name="urlAuth"></li><br>
+            <input type="url" name="authURL" value='{% if authURL %} {{authURL}} {% else %}{% endif %}'></li>
             <li>Url envío de registros:
-            <input type="url" name="urlReg"></li><br>
+            <input type="url" name="regURL" value='{% if regURL %} {{regURL}} {% else %}{% endif %}'></li>
         </ul>
-        <b>Envío datos de salud</b><br>
+        <h4>Envío datos de salud</h4>
         <ul>
-            <li><input type="checkbox" name="sendHealth"> Habilitar envío de registros de salud</li><br>
+            <li>Habilitar envío de registros de salud <input type="checkbox" name="sendHealth"></li>
             <li>Url envío de estados de salud:
-            <input type="url" name="healthUrl"></li><br>
+            <input type="url" name="healthURL" value='{% if healthURL %} {{healthURL}} {% else %}{% endif %}'></li>
             <li>Frecuencia de envío de datos de salud(en segundos):
-            <input type="number" name="healthFreq" min="0"></li><br>
+            <input type="number" name="healthFreq" min="0" value={% if healthFreq %} {{healthFreq}} {% else %} 10 {% endif %}></li>
             <li>Frecuencia de verificación de datos de salud(en segundos):
-            <input type="number" name="healthVerFreq" min="0"></li><br>
+            <input type="number" name="healthVerFreq" min="0" value={% if healthVerFreq %} {{healthVerFreq}} {% else %} 10 {% endif %}></li>
         </ul>
-        <b>Salida</b>
+        <h4>Salida</h4>
         <ul>
             <li>Directorio de salida:
-            <input type="text" name="outputDir"></li><br>
+            <input type="text" name="outputDir" value='{% if outputDir %} {{outputDir}} {% else %} /home/ {% endif %}'></li>
         </ul>
-        <input type="submit" name='submit' value="Enviar">
+        <input type="submit" name='submit' value="Guardar">
+        <input type="button" value="Detener" onclick="stopDAQEQ()">
+        <input type='button' value="Iniciar" onclick="startDAQEQ()">
+      </div>
     </form>
-</div>
-</body>
+  </body>
 </html>

@@ -52,8 +52,7 @@ def newPlot(request):
 
 def config(request):
 	if request.method == "POST":
-		if request.POST['']
 		return request
 	else:
 		configData = parseConfigFile()
-		return render(request, 'plot/config.html', { "sensors" : configData })
+		return render(request, 'plot/config.html', configData)
