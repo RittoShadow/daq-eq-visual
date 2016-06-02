@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
+  {% extends 'plot/home.html' %}
+  {% load bootstrap3 %}
+  {% load static %}
   <meta charset="utf-8">
   <script type="text/javascript">
 
@@ -18,18 +21,17 @@
   }
   </script>
   <head>
-    <!--{% load socketio_tags %}-->
-    {% socketio %}
     <script src="{{STATIC_URL}}js/daqeq.js" type='text/javascript'></script>
-    {% load staticfiles %}
     <script src="{% static "plot/js/daqeq.js" %}"></script>
-
+    {% block title %}
   <title>{{ page_title }}</title>
   <!-- etc. -->
+    {% endblock %}
   </head>
   <body>
+    {% block content %}
     {% csrf_token %}
-    <form action='/plot/config/' method="post">
+    <form action='/plot/config/' method="post" class="form">
       <div style="position:relative, height:100%">
         <div style="width:50%; position:relative">
           <h4>Parametros generales</h4>
@@ -55,7 +57,7 @@
             <li>Nombre de Red:<input type="text" name="networkName" value='{% if networkName %} {{networkName}} {% else %} localhost {% endif %}'></li>
           </ul>
         </div>
-        <div style="width:50%; position:absolute; top:0px; right:0px">
+        <div style="width:50%; position:absolute; right:0px">
           <h4>Configuración para sensores</h4>
           <ul>
             <li>Iniciar automáticamente<input type="checkbox" name="autoInit">
@@ -131,5 +133,6 @@
         <input type='button' value="Iniciar" onclick="startDAQEQ()">
       </div>
     </form>
+    {% endblock %}
   </body>
 </html>

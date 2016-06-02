@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<head>
+  {% extends 'plot/home.html' %}
+  {% load bootstrap3 %}
+  {% load staticfiles %}
+  <script src="{{STATIC_URL}}js/daqeq.js" type='text/javascript'></script>
+  <script src="{% static "plot/js/daqeq.js" %}"></script>
+{% block title %}
+{{page_title}}
+{% endblock %}
+<!-- etc. -->
+</head>
+{% block content %}
+<body>
+  <div>
+    <form action='/plot/result/' method="post" class="form">
+    {% csrf_token %}
+    {% if buffer %}
+    <select name="to_plot">
+      {% for b in buffer %}
+        <option value='{{b}}'>{{b}}</option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="Plot">
+    {% endif %}
+    </form>
+    {% if plot %}
+  	<img src='{% newPlot(data) %}' />
+    {% endif %}
+  </div>
+</body>
+{% endblock %}
+</html>

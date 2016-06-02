@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+{% load bootstrap3 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block bootstrap3_content %}
+<div class="container">
+    <nav  class="navbar navbar-default">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'plot/home' %}">RBA DAQ-EQ</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="{% url 'plot/graph' %}">Local Files</a></li>
+                <li><a href="{% url 'plot/chart' %}">Real-time Visualization</a></li>
+                <li><a href="{% url 'plot/config' %}">Configuration</a></li>
+                <li><a href="{% url 'plot/chart' %}">Real-time Visualization</a></li>
+            </ul>
+        </div>
+    </nav>
+
+
+    <h1>{% block title %}(no title){% endblock %}</h1>
+
+    {% bootstrap_messages %}
+
+    {% block content %}(no content){% endblock %}
+</div>
+
+{% endblock %}

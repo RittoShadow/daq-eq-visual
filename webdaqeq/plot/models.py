@@ -1,28 +1,27 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from django.db import models
 from django.forms import ModelForm
+from django.core.validators import *
+from django.utils.translation import ugettext_lazy as _
 
 class Configuration(models.Model):
-    graphWindow = models.IntegerField(default=5)
-    filterWindow = models.IntegerField(default=10)
-    preEventTime = models.IntegerField(default=10)
-    postEventTime = models.IntegerField(default=10)
-    minTimeRunning = models.IntegerField(default=20)
+    graphWindow = models.IntegerField(default=5, validators=MinValueValidator(5))
+    filterWindow = models.IntegerField(default=10, validators=MinValueValidator(10))
+    preEventTime = models.IntegerField(default=10, validators=MinValueValidator(10))
+    postEventTime = models.IntegerField(default=10, validators=MinValueValidator(10))
+    minTimeRunning = models.IntegerField(default=20, validators=MinValueValidator(20))
     votes = models.IntegerField(default=1)
-    enableRegistry = models.BooleanField(default=False)
-    recordLength = models.IntegerField(default=900)
+    enableRecording = models.BooleanField(default=False)
+    recordLength = models.IntegerField(default=900, validators=MinValueValidator(100))
     filenameFormat = models.CharField(max_length=50)
     enableTrigger = models.BooleanField(default=False)
     serverURL = models.URLField()
-    portNumber = models.IntegerField()
+    portNumber = models.IntegerField(validators=MinValueValidator(0))
     networkName = models.CharField(max_length=50)
     enableAutoStart = models.BooleanField()
     outputDir = models.FilePathField()
-
-    def __save__(self):
-        self.save()
-        createConfigFile()
 
 class Notification(models.Model):
     username = models.CharField(max_length=20)
@@ -32,20 +31,56 @@ class Notification(models.Model):
     phoneNumber = models.CharField(max_length=15)
     sendSMS = models.BooleanField()
     sendRecord = models.BooleanField()
-    compressRegistry = models.BooleanField()
+    compressRecord = models.BooleanField()
     authenticationURL = models.CharField(max_length=50)
     recordURL = models.URLField()
     sendStructHealth = models.BooleanField()
     structHealthURL = models.URLField()
-    sendFrequency = models.IntegerField()
-    verificationFrequency = models.IntegerField()
+    sendFrequency = models.IntegerField(validators=MinValueValidator(1))
+    verificationFrequency = models.IntegerField(validators=MinValueValidator(1))
 
 class configForm(ModelForm):
     class Meta:
         model = Configuration
-        fields = ['graphWindow','filterWindow','preEventTime','postEventTime','minTimeRunning','votes','enableRegistry','registryLength','filenameFormat','enableTrigger','serverURL','portNumber','enableAutoStart','outputDir']
+        fields = '__all__'
+        labels = {
+            'graphWindow': _('Ventana de gráfico:'),
+            'filterWindow': _('Ventana de filtro:'),
+            'preEventTime': _('Pre-evento:'),
+            'postEventTime': _('Post-evento:'),
+            'minTimeRunning': _('Minimum Time Running:'),
+            'votes': _('Votos'),
+            'enableRecording': _('Habilitar registro'),
+            'recordLength': _('Duración registro'),
+            'filenameFormat': _('Formato nombre de archivo'),
+            'enableTrigger': _('Habilitar Trigger Externo'),
+            'serverURL': _('URL de Server:'),
+            'portNumber': _('Puerto:'),
+            'networkName': _('Nombre de Red:'),
+            'enableAutoStart': _('Habilitar inicio automático'),
+            'outputDir': _('Ruta destino:'),
+        }
 
-
+class notifyForm(ModelForm):
+    class Meta:
+        model = Notification
+        fields = '__all__'
+        labels = {
+            'username': _('Nombre de usuario:'),
+            'password': _('Contraseña:'),
+            'structure': _('Estructura:'),
+            'email': _('Correo electrónico:'),
+            'phoneNumber': _('Número de teléfono:'),
+            'sendSMS': _('Enviar SMS'),
+            'sendRecord': _('Habilitar envío de registros de evento'),
+            'compressRecord': _('Enviar registro comprimido'),
+            'authenticationURL': _('URL Autenticación:'),
+            'recordURL': _('URL Envio de Registros:'),
+            'sendStructHealth': _('Habilitar envío de registros de salud'),
+            'structHealthURL': _('URL envío de estados de salud'),
+            'sendFrequency': _('Frecuencia de envío de estado de salud:'),
+            'verificationFrequency': _('Frecuencia de verificación de estado de salud:'),
+        }
 
 class SensorParams(models.Model):
     def __init__(self, serialNum):
