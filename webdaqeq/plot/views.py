@@ -2,6 +2,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import FormView
+from django.conf import settings
+
 import matplotlib
 matplotlib.use('Agg')
 import netifaces as net
@@ -9,6 +11,7 @@ import plot
 import os
 import io
 import re
+import time
 from PIL import Image
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from models import configForm, notifyForm
@@ -21,7 +24,7 @@ def home(request):
 def index(request):
 	daqeq_home = "/home/rba/Downloads/RBA-DAQ_multisensor/"
 	files = sorted(map(lambda p : daqeq_home+'trunk/enviados/'+str(p), os.listdir(daqeq_home+'trunk/enviados')), key=os.path.getsize)
-	files = files + os.listdir(daqeq_home+'trunk/')
+	files = files + map(lambda p: daqeq_home+"trunk/"+str(p), os.listdir(daqeq_home+'trunk/'))
 	files = filter(lambda p : re.search("[\w_-]+TEST[\w_-]+\.txt",p),files)
 	return render(request, "plot/index.html", { "buffer" : files , "page_title" : "Seleccione un archivo:" })
 # Create your views here.
@@ -30,16 +33,7 @@ def formatData(request):
 	if request.method == "POST":
 		buff = request.POST["to_plot"]
 		if buff:
-			data = None
-			try:
-				data = plot.parse(daqeq_home+"trunk/"+buff) #Suppose there's a stream of data running.
-			except IOError:
-				data = plot.parse(daqeq_home+"trunk/enviados/"+buff)
-			figure = plot.staticPlot(data)
-			canvas = FigureCanvasAgg(figure)
-			response = HttpResponse(content_type='image/png')
-			canvas.print_png(response)
-			return render(request, "plot/index.html", { "page_title" : "Visualización" , "plot" : True , "data" : data })
+			return render(request, "plot/index.html", { "page_title" : "Visualización" , "plot" : True , "data" : buff })
 		else:
 			files = sorted( map(lambda p : '/home/pi/Desktop/daqeq/trunk/enviados/'+str(p), os.listdir('/home/pi/Desktop/daqeq/trunk/enviados')), key=os.path.getctime)
 			return render(request, 'plot/index.html', { "graph" : "Something to show, but no" , "file" : files[-1] })
@@ -51,15 +45,11 @@ def subscribe(request):
 	return render(request, 'plot/plot.html', { "ip" : ip })
 
 def newPlot(request,data):
-	data = data[1:-1]
-	data = data.split("],")
-	for i in range(len(data)):
-		data[i] = float(re.sub(r"[\[\]\s]","",data[i]).split(","))
+	data = plot.parse(data)
 	figure = plot.staticPlot(data)
 	canvas = FigureCanvasAgg(figure)
 	response = HttpResponse(content_type='image/png')
 	canvas.print_png(response)
-	figure.close()
 	return response
 
 def config(request):
@@ -82,6 +72,19 @@ def start_stop_signal(request):
 	if request.POST["this_url"]:
 		return redirect(request.POST["this_url"])
 
+def ask_daqeq_status():
+	import os
+
+	# Obtener PID del proceso de app en c++ de daq-eq
+	route = settings.BASE_DIR+"/plot"
+	os.chdir(route)
+	result = os.popen("sudo python ask_daqeq_status.py").read()
+	return result
+
+def view(request):
+	return render(request, 'plot/views.html', {})
+
+
 class ConfigurationFormView(FormView):
 	template_name = 'plot/notification.html'
 	form_class = configForm
@@ -90,6 +93,7 @@ class ConfigurationFormView(FormView):
 		context = super(ConfigurationFormView, self).get_context_data(**kwargs)
 		context["page_title"] = "Configuración"
 		context["this_url"] = "/plot/config/"
+		context["action_text"] = ask_daqeq_status()
 		return context
 
 
@@ -101,4 +105,5 @@ class NotificationFormView(FormView):
 		context = super(NotificationFormView, self).get_context_data(**kwargs)
 		context["page_title"] = "Notificaciones"
 		context["this_url"] = "/plot/notification/"
+		context["action_text"] = ask_daqeq_status()
 		return context

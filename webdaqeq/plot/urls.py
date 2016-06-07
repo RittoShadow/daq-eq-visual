@@ -11,6 +11,7 @@ urlpatterns = [
 	 url(r'^config/', views.ConfigurationFormView.as_view(), name='config'),
 	 url(r'^notification/', views.NotificationFormView.as_view(), name='notify'),
 	 url(r'^signal/', views.start_stop_signal, name='signal'),
+	 url(r'^views/', views.view, name="view"),
 ]
 
 #\[(\[(\-?(\d+\.\d+)+(e(\+|\-)\d+)?)(\-?(\d+\.\d+)+(e(\+|\-)\d+)?\,\s)+(\-?(\d+\.\d+)+(e(\+|\-)\d+)?)\](\,\s)?)+\]

@@ -19,6 +19,7 @@ from django.contrib import admin
 import plot
 
 urlpatterns = [
+    url(r'^', include('plot.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^plot/', include('plot.urls'))
 ]

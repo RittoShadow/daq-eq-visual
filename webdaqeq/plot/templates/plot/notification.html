@@ -15,7 +15,7 @@
   </form>
   <form role="form" method="post" action="/plot/signal/">
     {% csrf_token %}
-    <input class="button" name="action" type="submit" value="Detener">
+    <input class="button" name="action" type="submit" value="{{action_text}}">
     <input type="hidden" name="this_url" value="{{this_url}}">
   </form>
   <form role="form" name="action" method="post" action="/plot/signal/">

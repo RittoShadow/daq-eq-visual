@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+{% extends 'plot/home.html' %}
+{% load bootstrap3 %}
+{% load staticfiles %}
+<head>
+
+{% block meta %}
+<meta charset="utf-8">
+
+<style>
+body {font-family: "Lato", sans-serif;}
+
+ul.tab {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Float the list items side by side */
+ul.tab li {float: left;}
+
+/* Style the links inside the list items */
+ul.tab li a {
+    display: inline-block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of links on hover */
+ul.tab li a:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+ul.tab li a:focus, .active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+</style>
+{% endblock %}
+
+<body>
+  {% block title %}
+  Servicio de Graficación DAQ-EQ ^mini
+  {% endblock %}
+
+  {% block content %}
+
+<ul class="tab">
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'All')">Todos</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, '1')">Sensor 1</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, '2')">Sensor 2</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, '3')">Sensor 3</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, '4')">Sensor 4</a></li>
+</ul>
+
+<div id="All" class="tabcontent">
+  <p>Aquí va el gráfico compuesto.</p>
+</div>
+
+<div id="1" class="tabcontent">
+  <p>Aquí va el gráfico del primer sensor.</p>
+</div>
+
+<div id="2" class="tabcontent">
+  <p>Aquí va el gráfico del 2do sensor, si es que existe.</p>
+</div>
+
+<div id="3" class="tabcontent">
+  <p>Aquí va el gráfico del 3er sensor, si es que existe.</p>
+</div>
+
+<div id="4" class="tabcontent">
+  <p>Aquí va el gráfico del 4to sensor, si es que existe.</p>
+</div>
+
+<p>
+
+<form>
+	<b>Parámetros</b><br>
+		<ul>
+			<li>Eje X
+			<input type="checkbox" id="X" onclick='clickX(this);'></li><br>
+			<li>Eje Y
+			<input type="checkbox" id="Y" onclick='clickY(this);'></li><br>
+			<li>Eje Z
+			<input type="checkbox" id="Z" onclick='clickZ(this);'></li><br>
+		</ul>
+</form>
+
+
+<button id="start_stop" type="button" onclick='buttonHandler()'><object id="img"> <img src="/static/plot/img/pause.png"> </object></button>
+
+
+<script>
+var x = false;
+var y = false;
+var z = false;
+var start = false;
+
+function openTab(evt, id) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tabcontent.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(id).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+function updateTexts(){
+	if(start == true){
+		if(x==true){
+			if(y==true){
+				if(z==true){
+					document.getElementById("All").innerHTML = "<p>Aquí va el gráfico compuesto. XYZ</p>"
+					document.getElementById("1").innerHTML = "<p>Aquí va el gráfico del primer sensor. XYZ</p>"
+					document.getElementById("2").innerHTML = "<p>Aquí va el gráfico del 2do sensor, si es que existe. XYZ</p>"
+					document.getElementById("3").innerHTML = "<p>Aquí va el gráfico del 3er sensor, si es que existe. XYZ</p>"
+					document.getElementById("4").innerHTML = "<p>Aquí va el gráfico del 4to sensor, si es que existe. XYZ</p>"
+				}
+				else{
+					document.getElementById("All").innerHTML = "<p>Aquí va el gráfico compuesto. XY</p>"
+					document.getElementById("1").innerHTML = "<p>Aquí va el gráfico del primer sensor. XY</p>"
+					document.getElementById("2").innerHTML = "<p>Aquí va el gráfico del 2do sensor, si es que existe. XY</p>"
+					document.getElementById("3").innerHTML = "<p>Aquí va el gráfico del 3er sensor, si es que existe. XY</p>"
+					document.getElementById("4").innerHTML = "<p>Aquí va el gráfico del 4to sensor, si es que existe. XY</p>"
+				}
+			}
+			else{
+				if(z==true){
+					document.getElementById("All").innerHTML = "<p>Aquí va el gráfico compuesto. XZ</p>"
+					document.getElementById("1").innerHTML = "<p>Aquí va el gráfico del primer sensor. XZ</p>"
+					document.getElementById("2").innerHTML = "<p>Aquí va el gráfico del 2do sensor, si es que existe. XZ</p>"
+					document.getElementById("3").innerHTML = "<p>Aquí va el gráfico del 3er sensor, si es que existe. XZ</p>"
+					document.getElementById("4").innerHTML = "<p>Aquí va el gráfico del 4to sensor, si es que existe. XZ</p>"
+				}
+				else{
+					document.getElementById("All").innerHTML = "<p>Aquí va el gráfico compuesto. X</p>"
+					document.getElementById("1").innerHTML = "<p>Aquí va el gráfico del primer sensor. X</p>"
+					document.getElementById("2").innerHTML = "<p>Aquí va el gráfico del 2do sensor, si es que existe. X</p>"
+					document.getElementById("3").innerHTML = "<p>Aquí va el gráfico del 3er sensor, si es que existe. X</p>"
+					document.getElementById("4").innerHTML = "<p>Aquí va el gráfico del 4to sensor, si es que existe. X</p>"
+				}
+			}
+		}
+		else{
+			if(y==true){
+				if(z==true){
+					document.getElementById("All").innerHTML = "<p>Aquí va el gráfico compuesto. YZ</p>"
+					document.getElementById("1").innerHTML = "<p>Aquí va el gráfico del primer sensor. YZ</p>"
+					document.getElementById("2").innerHTML = "<p>Aquí va el gráfico del 2do sensor, si es que existe. YZ</p>"
+					document.getElementById("3").innerHTML = "<p>Aquí va el gráfico del 3er sensor, si es que existe. YZ</p>"
+					document.getElementById("4").innerHTML = "<p>Aquí va el gráfico del 4to sensor, si es que existe. YZ</p>"
+				}
+				else{
+					document.getElementById("All").innerHTML = "<p>Aquí va el gráfico compuesto. Y</p>"
+					document.getElementById("1").innerHTML = "<p>Aquí va el gráfico del primer sensor. Y</p>"
+					document.getElementById("2").innerHTML = "<p>Aquí va el gráfico del 2do sensor, si es que existe. Y</p>"
+					document.getElementById("3").innerHTML = "<p>Aquí va el gráfico del 3er sensor, si es que existe. Y</p>"
+					document.getElementById("4").innerHTML = "<p>Aquí va el gráfico del 4to sensor, si es que existe. Y</p>"
+				}
+			}
+			else{
+				if(z==true){
+					document.getElementById("All").innerHTML = "<p>Aquí va el gráfico compuesto. Z</p>"
+					document.getElementById("1").innerHTML = "<p>Aquí va el gráfico del primer sensor. Z</p>"
+					document.getElementById("2").innerHTML = "<p>Aquí va el gráfico del 2do sensor, si es que existe. Z</p>"
+					document.getElementById("3").innerHTML = "<p>Aquí va el gráfico del 3er sensor, si es que existe. Z</p>"
+					document.getElementById("4").innerHTML = "<p>Aquí va el gráfico del 4to sensor, si es que existe. Z</p>"
+				}
+				else{
+					document.getElementById("All").innerHTML = "<p>Aquí va el gráfico compuesto. No hay sensores seleccionados, sin embargo.</p>"
+					document.getElementById("1").innerHTML = "<p>Aquí va el gráfico del primer sensor. No hay sensores seleccionados, sin embargo.</p>"
+					document.getElementById("2").innerHTML = "<p>Aquí va el gráfico del 2do sensor, si es que existe. No hay sensores seleccionados, sin embargo.</p>"
+					document.getElementById("3").innerHTML = "<p>Aquí va el gráfico del 3er sensor, si es que existe. No hay sensores seleccionados, sin embargo.</p>"
+					document.getElementById("4").innerHTML = "<p>Aquí va el gráfico del 4to sensor, si es que existe. No hay sensores seleccionados, sin embargo.</p>"
+				}
+			}
+		}
+	}
+	else{
+		document.getElementById("All").innerHTML = "<p>Aquí va el gráfico compuesto. La graficación se encuentra detenida, sin embargo.</p>"
+		document.getElementById("1").innerHTML = "<p>Aquí va el gráfico del primer sensor. La graficación se encuentra detenida, sin embargo.</p>"
+		document.getElementById("2").innerHTML = "<p>Aquí va el gráfico del 2do sensor, si es que existe. La graficación se encuentra detenida, sin embargo.</p>"
+		document.getElementById("3").innerHTML = "<p>Aquí va el gráfico del 3er sensor, si es que existe. La graficación se encuentra detenida, sin embargo.</p>"
+		document.getElementById("4").innerHTML = "<p>Aquí va el gráfico del 4to sensor, si es que existe. La graficación se encuentra detenida, sin embargo.</p>"
+	}
+}
+
+function clickX(cb){
+	x = cb.checked;
+	updateTexts()
+}
+
+function clickY(cb){
+	y = cb.checked;
+	updateTexts()
+}
+
+function clickZ(cb){
+	z = cb.checked;
+	updateTexts()
+}
+
+function buttonHandler(){
+	if(start == false){
+		start = true;
+		document.getElementById("img").innerHTML = '<img src="/static/plot/img/play.png">'
+		updateTexts();
+	}
+	else{
+		start = false;
+		document.getElementById("img").innerHTML = '<img src="/static/plot/img/pause.png">'
+		updateTexts();
+	}
+}
+
+</script>
+
+</body>
+{% endblock %}
+</html>
