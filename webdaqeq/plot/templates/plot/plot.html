@@ -1,9 +1,13 @@
 <!doctype html>
 <html>
-<head>
-<title>Websocket</title>
 {% extends 'plot/home.html' %}
 {% load bootstrap3 %}
+<head>
+{% block title %}
+<title>Websocket</title>
+{% endblock %}
+
+{% block content %}
 <!--<script src="{{STATIC_URL}}js/jquery-1.12.3.min.js" type='text/javascript'></script>
 <script src="{{STATIC_URL}}daqeq_ws/chart.js" type='text/javascript'></script>-->
 <script>
@@ -230,4 +234,5 @@ b.moveTo(g,p);b.lineTo(g,p-d*v(a.datasets[e].data[f],j,k)+c.barStrokeWidth/2);b.
     });
   });
 </script>
+{% endblock %}
 </body></html>

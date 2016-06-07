@@ -4,7 +4,7 @@
   {% load bootstrap3 %}
   <meta charset="utf-8">
   {% block title %}
-    Notificaciones
+    {{page_title}}
   {% endblock %}
 
   {% block content %}
@@ -12,6 +12,16 @@
       {% csrf_token %}
       {% bootstrap_form form layout=layout %}
       {% buttons submit='OK' reset="Cancel" %}{% endbuttons %}
+  </form>
+  <form role="form" method="post" action="/plot/signal/">
+    {% csrf_token %}
+    <input class="button" name="action" type="submit" value="Detener">
+    <input type="hidden" name="this_url" value="{{this_url}}">
+  </form>
+  <form role="form" name="action" method="post" action="/plot/signal/">
+    {% csrf_token %}
+    <input class="button" name="action" type="submit" value="Reiniciar">
+    <input type="hidden" name="this_url" value="{{this_url}}">
   </form>
 {% endblock %}
 </html>

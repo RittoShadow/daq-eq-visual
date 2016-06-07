@@ -25,7 +25,8 @@
     {% endif %}
     </form>
     {% if plot %}
-  	<img src='{% newPlot(data) %}' />
+  	<img src='{% url "img" data %}'/>
+    /plot/image/{{data}}
     {% endif %}
   </div>
 </body>

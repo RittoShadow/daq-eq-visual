@@ -23,11 +23,11 @@
     </nav>
 
 
-    <h1>{% block title %}(no title){% endblock %}</h1>
+    <h1>{% block title %}{{page_title}}{% endblock %}</h1>
 
     {% bootstrap_messages %}
 
-    {% block content %}(no content){% endblock %}
+    {% block content %}{{page_content}}{% endblock %}
 </div>
 
 {% endblock %}
