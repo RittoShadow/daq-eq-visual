@@ -110,21 +110,21 @@ def configVerification(request):
 			else:
 				os.popen("sudo python command_client.py ersf")
 			if request.POST["graphWindow"]:
-				command_server("ngs",int(request.POST["graphWindow"]))
+				command_server("ngs",request.POST["graphWindow"])
 			if request.POST["filterWindow"]:
-				command_server("nfs",int(request.POST["filterWindow"]))
+				command_server("nfs",request.POST["filterWindow"])
 			if request.POST["preEventTime"]:
-				command_server("nas",int(request.POST["preEventTime"]))
+				command_server("nas",request.POST["preEventTime"])
 			if request.POST["postEventTime"]:
-				command_server("nbs",int(request.POST["postEventTime"]))
+				command_server("nbs",request.POST["postEventTime"])
 			if request.POST["minTimeRunning"]:
-				command_server("nms",int(request.POST["minTimeRunning"]))
+				command_server("nms",request.POST["minTimeRunning"])
 			if request.POST["votes"]:
-				command_server("nvs",int(request.POST["votes"]))
+				command_server("nvs",request.POST["votes"])
 			if request.POST["recordLength"]:
-				command_server("nrs",int(request.POST["recordLength"]))
+				command_server("nrs",request.POST["recordLength"])
 			if request.POST["portNumber"]:
-				command_server("nps",int(request.POST["portNumber"]))
+				command_server("nps",request.POST["portNumber"])
 			command_server("0")
 		elif request.POST["this_url"] == "/plot/notification/":
 			command_server("0")
