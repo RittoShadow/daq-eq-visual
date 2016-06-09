@@ -68,7 +68,7 @@ def start_stop_signal(request):
 	pid = os.popen("pgrep 'RBA-DAQ-EQ'").read()
 	if (pid) :
 	    # Enviar signal SIG_USR1 a app en c++, para iniciar/detener adquirir datos
-	    os.kill(int(pid), signal.SIGUSR1) # Unix version only...
+		os.kill(int(pid), signal.SIGUSR1) # Unix version only...
 	if request.POST["this_url"]:
 		return redirect(request.POST["this_url"])
 
@@ -78,16 +78,47 @@ def ask_daqeq_status():
 	# Obtener PID del proceso de app en c++ de daq-eq
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
-	result = os.popen("sudo python ask_daqeq_status.py").read()
-	return result
+	result = int(os.popen("sudo python ask_daqeq_status.py").read())
+	if result == 0:
+		return "Reiniciar"
+	elif result == 1:
+		return "Detener"
+	else:
+		return "Error"
 
 def view(request):
 	return render(request, 'plot/views.html', {})
+
+def configVerification(request):
+	route = settings.BASE_DIR+"/plot"
+	os.chdir(route)
+	if request.method == "POST":
+		if request.POST["this_url"] == "/plot/config/":
+			if "enableAutoStart" in request.POST:
+				os.popen("sudo python command_client.py ast")
+			else:
+				os.popen("sudo python command_client.py asf")
+			os.popen("sudo python command_client.py 0")
+		elif request.POST["this_url"] == "/plot/notification/":
+			print "yay"
+		else:
+			return request
+	return redirect(request.POST["this_url"])
 
 
 class ConfigurationFormView(FormView):
 	template_name = 'plot/notification.html'
 	form_class = configForm
+
+	def __init__(self, *args, **kwargs):
+		route = settings.BASE_DIR+"/plot"
+		os.chdir(route)
+		a = os.popen("sudo python command_client.py ag").read().strip()
+		if a == "1":
+			self.initial['enableAutoStart'] = 'on'
+		else:
+			self.initial['enableAutoStart'] = None
+		super(ConfigurationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
 		context = super(ConfigurationFormView, self).get_context_data(**kwargs)

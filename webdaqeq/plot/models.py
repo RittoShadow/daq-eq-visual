@@ -15,13 +15,13 @@ class Configuration(models.Model):
     votes = models.IntegerField(default=1)
     enableRecording = models.BooleanField(default=False)
     recordLength = models.IntegerField(default=900, validators=MinValueValidator(100))
-    filenameFormat = models.CharField(max_length=50)
+    filenameFormat = models.CharField(default="E-TEST-yyyyMMdd_hhmmss",max_length=50)
     enableTrigger = models.BooleanField(default=False)
-    serverURL = models.URLField()
-    portNumber = models.IntegerField(validators=MinValueValidator(0))
-    networkName = models.CharField(max_length=50)
+    serverURL = models.URLField(default="http://www.shmrba.com")
+    portNumber = models.IntegerField(default=7624,validators=MinValueValidator(0))
+    networkName = models.CharField(default="Red0",max_length=50)
     enableAutoStart = models.BooleanField()
-    outputDir = models.FilePathField()
+    outputDir = models.CharField(default="/home/",max_length=50)
 
 class Notification(models.Model):
     username = models.CharField(max_length=20)

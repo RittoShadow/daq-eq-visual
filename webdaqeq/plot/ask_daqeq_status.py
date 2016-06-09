@@ -5,12 +5,12 @@ signaled = False
 def answer_yes_handler(signum, frame):
     global signaled
     signaled = True
-    print "Detener"
+    print 1
 
 def answer_no_handler(signum, frame):
     global signaled
     signaled = True
-    print "Reiniciar"
+    print 0
 
 # Obtener PID del proceso de app en c++ de daq-eq
 pid = os.popen("pgrep 'RBA-DAQ-EQ'").read()
@@ -27,4 +27,4 @@ if pid :
     time.sleep(5)
 
 if signaled == False:
-    print "NaN"
+    print -1
