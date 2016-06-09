@@ -16,7 +16,7 @@
       {% buttons submit='Guardar' reset="Cancelar" %}{% endbuttons %}
   </form>
   {% else %}
-    {{action_text}}
+    <p>Para hacer cambios, debe detener la aplicación primero.</p>
   {% endif %}
   <form role="form" method="post" action="/plot/signal/">
     {% csrf_token %}

@@ -15,14 +15,14 @@ import time
 from PIL import Image
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from models import configForm, notifyForm
+from command_client import *
 
-daqeq_home = "/home/rba/Downloads/RBA-DAQ_multisensor/"
+daqeq_home = settings.DAQEQ_HOME
 
 def home(request):
 	return render(request, "plot/home.html", {})
 
 def index(request):
-	daqeq_home = "/home/rba/Downloads/RBA-DAQ_multisensor/"
 	files = sorted(map(lambda p : daqeq_home+'trunk/enviados/'+str(p), os.listdir(daqeq_home+'trunk/enviados')), key=os.path.getsize)
 	files = files + map(lambda p: daqeq_home+"trunk/"+str(p), os.listdir(daqeq_home+'trunk/'))
 	files = filter(lambda p : re.search("[\w_-]+TEST[\w_-]+\.txt",p),files)
@@ -95,12 +95,36 @@ def configVerification(request):
 	if request.method == "POST":
 		if request.POST["this_url"] == "/plot/config/":
 			if "enableAutoStart" in request.POST:
-				os.popen("sudo python command_client.py ast")
+				command_server("east")
 			else:
-				os.popen("sudo python command_client.py asf")
-			os.popen("sudo python command_client.py 0")
+				command_server("easf")
+			if "enableTrigger" in request.POST:
+				command_server("etst")
+			else:
+				command_server("etsf")
+			if "enableRecording" in request.POST:
+				os.popen("sudo python command_client.py erst")
+			else:
+				os.popen("sudo python command_client.py ersf")
+			if request.POST["graphWindow"]:
+				command_server("ngs",int(request.POST["graphWindow"]))
+			if request.POST["filterWindow"]:
+				command_server("nfs",int(request.POST["filterWindow"]))
+			if request.POST["preEventTime"]:
+				command_server("nas",int(request.POST["preEventTime"]))
+			if request.POST["postEventTime"]:
+				command_server("nbs",int(request.POST["postEventTime"]))
+			if request.POST["minTimeRunning"]:
+				command_server("nms",int(request.POST["minTimeRunning"]))
+			if request.POST["votes"]:
+				command_server("nvs",int(request.POST["votes"]))
+			if request.POST["recordLength"]:
+				command_server("nrs",int(request.POST["recordLength"]))
+			if request.POST["portNumber"]:
+				command_server("nps",int(request.POST["portNumber"]))
+			command_server("0")
 		elif request.POST["this_url"] == "/plot/notification/":
-			print "yay"
+			command_server("0")
 		else:
 			return request
 	return redirect(request.POST["this_url"])
@@ -113,11 +137,22 @@ class ConfigurationFormView(FormView):
 	def __init__(self, *args, **kwargs):
 		route = settings.BASE_DIR+"/plot"
 		os.chdir(route)
-		a = os.popen("sudo python command_client.py ag").read().strip()
-		if a == "1":
+		if command_server("eag") == "1":
 			self.initial['enableAutoStart'] = 'on'
 		else:
 			self.initial['enableAutoStart'] = None
+		if command_server("etg") == "1":
+			self.initial['enableTrigger'] = 'on'
+		if command_server("erg") == "1":
+			self.initial['enableRecording'] = 'on'
+		self.initial['graphWindow'] = command_server("ngg")
+		self.initial['filterWindow'] = command_server("nfg")
+		self.initial['preEventTime'] = command_server("nag")
+		self.initial['postEventTime'] = command_server("nbg")
+		self.initial['minTimeRunning'] = command_server("nmg")
+		self.initial['votes'] = command_server("nvg")
+		self.initial['recordLength'] = command_server("nrg")
+		self.initial['portNumber'] = command_server("npg")
 		super(ConfigurationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):

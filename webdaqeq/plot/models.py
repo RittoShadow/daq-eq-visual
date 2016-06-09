@@ -20,7 +20,7 @@ class Configuration(models.Model):
     serverURL = models.URLField(default="http://www.shmrba.com")
     portNumber = models.IntegerField(default=7624,validators=MinValueValidator(0))
     networkName = models.CharField(default="Red0",max_length=50)
-    enableAutoStart = models.BooleanField()
+    enableAutoStart = models.BooleanField(default=False)
     outputDir = models.CharField(default="/home/",max_length=50)
 
 class Notification(models.Model):
@@ -29,12 +29,12 @@ class Notification(models.Model):
     structure = models.CharField(max_length=10)
     email = models.EmailField(max_length=50)
     phoneNumber = models.CharField(max_length=15)
-    sendSMS = models.BooleanField()
-    sendRecord = models.BooleanField()
-    compressRecord = models.BooleanField()
+    sendSMS = models.BooleanField(default=False)
+    sendRecord = models.BooleanField(default=False)
+    compressRecord = models.BooleanField(default=False)
     authenticationURL = models.CharField(max_length=50)
     recordURL = models.URLField()
-    sendStructHealth = models.BooleanField()
+    sendStructHealth = models.BooleanField(default=False)
     structHealthURL = models.URLField()
     sendFrequency = models.IntegerField(validators=MinValueValidator(1))
     verificationFrequency = models.IntegerField(validators=MinValueValidator(1))
@@ -50,7 +50,7 @@ class configForm(ModelForm):
             'postEventTime': _('Post-evento:'),
             'minTimeRunning': _('Minimum Time Running:'),
             'votes': _('Votos'),
-            'enableRecording': _('Habilitar registro'),
+            'enableRecording': _('Habilitar registro continuo'),
             'recordLength': _('Duración registro'),
             'filenameFormat': _('Formato nombre de archivo'),
             'enableTrigger': _('Habilitar Trigger Externo'),
