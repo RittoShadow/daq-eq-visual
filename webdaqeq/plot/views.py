@@ -89,6 +89,9 @@ def ask_daqeq_status():
 def view(request):
 	return render(request, 'plot/views.html', {})
 
+def sensor(request):
+	return render(request, 'plot/sensors.html', {})
+
 def configVerification(request):
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)

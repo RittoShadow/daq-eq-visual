@@ -4,6 +4,7 @@ import socket   #for sockets
 import sys  #for exit
 import time
 import os
+import re
 
 def command_server(message, params=None):
     #create an INET, STREAMing socket
@@ -49,6 +50,9 @@ def command_server(message, params=None):
     try :
         #Set the whole string
         s.sendall(message)
+        if re.search("n\ws", message):
+            s.recv(4096)
+            s.sendall(params)
     except socket.error:
         #Send failed
         print 'Send failed'

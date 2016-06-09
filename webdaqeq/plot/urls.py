@@ -13,6 +13,7 @@ urlpatterns = [
 	 url(r'^signal/', views.start_stop_signal, name='signal'),
 	 url(r'^views/', views.view, name="view"),
 	 url(r'^verify/', views.configVerification, name="verify"),
+	 url(r'^sensors/', views.sensor, name="sensor"),
 ]
 
 #\[(\[(\-?(\d+\.\d+)+(e(\+|\-)\d+)?)(\-?(\d+\.\d+)+(e(\+|\-)\d+)?\,\s)+(\-?(\d+\.\d+)+(e(\+|\-)\d+)?)\](\,\s)?)+\]

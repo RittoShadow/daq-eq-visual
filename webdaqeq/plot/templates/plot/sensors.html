@@ -1,0 +1,40 @@
+{% extends 'plot/home.html' %}
+{% load bootstrap3 %}
+
+{% block meta %}
+<style>
+  table {
+      width: 100%;
+  }
+
+  th {
+      height: 50px;
+      text-align: left;
+  }
+</style>
+{% endblock %}
+
+{% block title %}
+Lista de Sensores
+{% endblock %}
+
+{% block content %}
+  <h4>Sensores detectados</h4>
+  <table>
+    <tr>
+      <th>N° de serie</th>
+      <th>Posición</th>
+      <th>Detrend</th>
+      <th>Trigger(x,y,z):</th>
+      <th>Detrigger(x,y,z):</th>
+      <th>Votos:</th>
+    </tr>
+  {% for sensor in sensores %}
+    <tr>
+      {% for param in sensor %}
+        <td>{{param}}</td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+  </table>
+{% endblock %}
