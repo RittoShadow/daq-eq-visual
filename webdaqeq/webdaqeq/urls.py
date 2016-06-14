@@ -20,8 +20,8 @@ import plot
 from plot import views
 
 urlpatterns = [
-    url(r'^', views.home),
     url('^', include('django.contrib.auth.urls')),
+    url(r'^$', views.home),
     url(r'^admin/', admin.site.urls),
     url(r'^plot/', include('plot.urls')),
 ]
