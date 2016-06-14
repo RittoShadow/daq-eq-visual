@@ -17,9 +17,11 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 import plot
+from plot import views
 
 urlpatterns = [
-    url(r'^', include('plot.urls')),
+    url(r'^', views.home),
+    url('^', include('django.contrib.auth.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^plot/', include('plot.urls'))
+    url(r'^plot/', include('plot.urls')),
 ]

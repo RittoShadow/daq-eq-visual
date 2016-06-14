@@ -90,7 +90,9 @@ def view(request):
 	return render(request, 'plot/views.html', {})
 
 def sensor(request):
-	return render(request, 'plot/sensors.html', {})
+	genericSensor = ["A2-300693","pos1",1,0.001,0.001,1]
+	sensorList = [genericSensor, genericSensor, genericSensor]
+	return render(request, 'plot/sensors.html', { "sensores" : sensorList })
 
 def configVerification(request):
 	route = settings.BASE_DIR+"/plot"

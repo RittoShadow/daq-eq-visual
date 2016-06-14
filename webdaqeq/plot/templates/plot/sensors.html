@@ -4,6 +4,7 @@
 {% block meta %}
 <style>
   table {
+      height:30%;
       width: 100%;
   }
 
@@ -21,21 +22,29 @@ Lista de Sensores
 
 {% block content %}
   <h4>Sensores detectados</h4>
-  <table>
-    <tr>
-      <th>N° de serie</th>
-      <th>Posición</th>
-      <th>Detrend</th>
-      <th>Trigger(x,y,z):</th>
-      <th>Detrigger(x,y,z):</th>
-      <th>Votos:</th>
-    </tr>
-  {% for sensor in sensores %}
-    <tr>
-      {% for param in sensor %}
-        <td>{{param}}</td>
-      {% endfor %}
-    </tr>
-  {% endfor %}
-  </table>
+  <div style="height:40%">
+    <table>
+      <tr>
+        <th>N° de serie</th>
+        <th>Posición</th>
+        <th>Detrend</th>
+        <th>Trigger(x,y,z):</th>
+        <th>Detrigger(x,y,z):</th>
+        <th>Votos:</th>
+      </tr>
+    {% for sensor in sensores %}
+      <tr>
+        {% for param in sensor %}
+          <td>{{param}}</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
+  </div>
+  <button onclick="" class="glyphicon glyphicon-refresh"></button>
+  <h5>Agregar Manualmente</h5>
+  <form action="/plot/sensors/">
+    <input type="text" name="new_sensor">
+    <input type="submit" value="Agregar serie">
+  </form>
 {% endblock %}
