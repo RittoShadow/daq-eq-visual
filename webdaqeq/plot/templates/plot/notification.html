@@ -8,20 +8,39 @@
   {% endblock %}
 
   {% block content %}
-  {% if action_text == "Reiniciar" %}
-  <form role="form" action="/plot/verify/" name="config" method="post" enctype="multipart/form-data" {% if layout != 'vertical' %}class="form-{{ layout }}"{% endif %}>
+  {% if user.is_authenticated %}
+    {% if action_text == "Reiniciar" %}
+    <form role="form" action="/plot/verify/" name="config" method="post" enctype="multipart/form-data" {% if layout != 'vertical' %}class="form-{{ layout }}"{% endif %}>
+        {% csrf_token %}
+        {% bootstrap_form form layout='horizontal' %}
+        <input type="hidden" name="this_url" value="{{this_url}}">
+        {% buttons submit='Guardar' reset="Cancelar" %}{% endbuttons %}
+    </form>
+    {% else %}
+      <p>Para hacer cambios, debe detener la aplicación primero.</p>
+    {% endif %}
+    <form role="form" method="post" action="/plot/signal/">
       {% csrf_token %}
-      {% bootstrap_form form layout=layout %}
+      <input class="button" name="action" type="submit" value="{{action_text}}">
       <input type="hidden" name="this_url" value="{{this_url}}">
-      {% buttons submit='Guardar' reset="Cancelar" %}{% endbuttons %}
-  </form>
+    </form>
   {% else %}
-    <p>Para hacer cambios, debe detener la aplicación primero.</p>
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <table>
+      <tr>
+          <td>Nombre de usuario</td>
+          <td><input type="text" name="username"></td>
+      </tr>
+      <tr>
+          <td>Contraseña</td>
+          <td><input type="password" name="password"></td>
+      </tr>
+      </table>
+
+      <input type="submit" value="Login" />
+      <input type="hidden" name="next" value="{{this_url}}" />
+    </form>
   {% endif %}
-  <form role="form" method="post" action="/plot/signal/">
-    {% csrf_token %}
-    <input class="button" name="action" type="submit" value="{{action_text}}">
-    <input type="hidden" name="this_url" value="{{this_url}}">
-  </form>
 {% endblock %}
 </html>

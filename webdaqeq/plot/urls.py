@@ -4,6 +4,8 @@ import views
 
 urlpatterns = [
 	 url(r'^$', views.home, name='home'),
+	 url(r'^login/$', views.loginDAQEQ, name='login'),
+	 url(r'^logout/$', views.logoutDAQEQ, name='logout'),
 	 url(r'^graph/', views.index, name='test'),
 	 url(r'^result/', views.formatData, name='result'),
 	 url(r'^image/(?P<data>.+)', views.newPlot, name='img'),

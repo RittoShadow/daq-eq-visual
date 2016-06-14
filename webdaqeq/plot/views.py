@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import FormView
 from django.conf import settings
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth import authenticate, login, logout
 
 import matplotlib
 matplotlib.use('Agg')
@@ -22,6 +24,27 @@ daqeq_home = settings.DAQEQ_HOME
 def home(request):
 	return render(request, "plot/home.html", {})
 
+def loginDAQEQ(request):
+	if request.method == "POST":
+	    username = request.POST['username']
+	    password = request.POST['password']
+	    user = authenticate(username=username, password=password)
+	    if user is not None:
+	        if user.is_active:
+	            login(request, user)
+	            return render(request, "plot/home.html", { "page_title" : "Bienvenido, "+username , "page_content" : "Has iniciado sesión."})
+	        else:
+	            return render(request, "plot/home.html", { "page_title" : "Bienvenido, intruso" , "page_content" : "No has iniciado sesión."})
+	    else:
+			return render(request, "login.html", { "page_title" : "Error" , "page_content" : "Combinación de usuario y contraseña incorrectas."})
+	else:
+		return render(request, "login.html", {})
+
+def logoutDAQEQ(request):
+	logout(request)
+	return render(request, "plot/home.html", {})
+
+@login_required()
 def index(request):
 	files = sorted(map(lambda p : daqeq_home+'trunk/enviados/'+str(p), os.listdir(daqeq_home+'trunk/enviados')), key=os.path.getsize)
 	files = files + map(lambda p: daqeq_home+"trunk/"+str(p), os.listdir(daqeq_home+'trunk/'))
@@ -78,7 +101,7 @@ def ask_daqeq_status():
 	# Obtener PID del proceso de app en c++ de daq-eq
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
-	result = int(os.popen("sudo python ask_daqeq_status.py").read())
+	result = int(os.popen("sudo python ask_daqeq_status.py").read().strip())
 	if result == 0:
 		return "Reiniciar"
 	elif result == 1:
@@ -86,14 +109,17 @@ def ask_daqeq_status():
 	else:
 		return "Error"
 
+@login_required()
 def view(request):
 	return render(request, 'plot/views.html', {})
 
+@login_required()
 def sensor(request):
 	genericSensor = ["A2-300693","pos1",1,0.001,0.001,1]
 	sensorList = [genericSensor, genericSensor, genericSensor]
 	return render(request, 'plot/sensors.html', { "sensores" : sensorList })
 
+@login_required()
 def configVerification(request):
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
@@ -127,13 +153,40 @@ def configVerification(request):
 				command_server("nrs",request.POST["recordLength"])
 			if request.POST["portNumber"]:
 				command_server("nps",request.POST["portNumber"])
+			if request.POST["filenameFormat"]:
+				command_server("sfs",request.POST["filenameFormat"])
+			# if request.POST["serverURL"]:
+			# 	command_server("sus",request.POST["serverURL"])
+			# if request.POST["networkName"]:
+			# 	command_server("sns",request.POST["networkName"])
+			# if request.POST["outputDir"]:
+			# 	command_server("sos",request.POST["outputDir"])
 			command_server("0")
 		elif request.POST["this_url"] == "/plot/notification/":
+			if "sendSMS" in request.POST:
+				command_server("emst")
+			else:
+				command_server("emsf")
+			if "sendRecord" in request.POST:
+				command_server("esst")
+			else:
+				command_server("essf")
+			if "compressRecord" in request.POST:
+				command_server("ecst")
+			else:
+				command_server("ecsf")
+			if "sendStructHealth" in request.POST:
+				command_server("ehst")
+			else:
+				command_server("ehsf")
+			if request.POST["sendFrequency"]:
+				command_server("nss",request.POST["sendFrequency"])
+			if request.POST["verificationFrequency"]:
+				command_server("nos",request.POST["verificationFrequency"])
 			command_server("0")
 		else:
 			return request
 	return redirect(request.POST["this_url"])
-
 
 class ConfigurationFormView(FormView):
 	template_name = 'plot/notification.html'
@@ -158,6 +211,7 @@ class ConfigurationFormView(FormView):
 		self.initial['votes'] = command_server("nvg")
 		self.initial['recordLength'] = command_server("nrg")
 		self.initial['portNumber'] = command_server("npg")
+		self.initial['filenameFormat'] = command_server("sfg")
 		super(ConfigurationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
@@ -171,6 +225,21 @@ class ConfigurationFormView(FormView):
 class NotificationFormView(FormView):
 	template_name = 'plot/notification.html'
 	form_class = notifyForm
+
+	def __init__(self, *args, **kwargs):
+		route = settings.BASE_DIR+"/plot"
+		os.chdir(route)
+		if command_server("emg") == "1":
+			self.initial['sendSMS'] = 'on'
+		if command_server("esg") == "1":
+			self.initial['sendRecord'] = 'on'
+		if command_server("ecg") == "1":
+			self.initial['compressRecord'] = 'on'
+		if command_server("ehg") == "1":
+			self.initial['sendStructHealth'] = 'on'
+		self.initial["sendFrequency"] = command_server("nsg")
+		self.initial["verificationFrequency"] = command_server("nog")
+		super(NotificationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
 		context = super(NotificationFormView, self).get_context_data(**kwargs)

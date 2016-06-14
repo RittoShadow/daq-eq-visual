@@ -53,6 +53,9 @@ def command_server(message, params=None):
         if re.search("n\ws", message):
             s.recv(4096)
             s.sendall(params)
+        if re.search("s\ws", message):
+            s.recv(4096)
+            s.sendall(params)
     except socket.error:
         #Send failed
         print 'Send failed'

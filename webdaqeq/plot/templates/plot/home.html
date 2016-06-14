@@ -20,6 +20,13 @@
                 <li><a href="/plot/notification/">Notificationes</a></li>
                 <li><a href="/plot/sensors/">Sensores</a></li>
                 <li><a href="/plot/views/">Visualizaciones</a></li>
+                <li>
+                  {% if user.is_authenticated %}
+                    <a href="/plot/logout/">Cerrar sesión</a>
+                  {% else %}
+                    <a href="/plot/login/">Inicio sesión</a>
+                  {% endif %}
+                </li>
             </ul>
         </div>
     </nav>
