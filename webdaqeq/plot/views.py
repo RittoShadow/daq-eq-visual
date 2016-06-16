@@ -36,15 +36,15 @@ def loginDAQEQ(request):
 	        else:
 	            return render(request, "plot/home.html", { "page_title" : "Bienvenido, intruso" , "page_content" : "No has iniciado sesión."})
 	    else:
-			return render(request, "login.html", { "page_title" : "Error" , "page_content" : "Combinación de usuario y contraseña incorrectas."})
+			return render(request, "registration/login.html", { "page_title" : "Error" , "page_content" : "Combinación de usuario y contraseña incorrectas."})
 	else:
-		return render(request, "login.html", {})
+		return render(request, "registration/login.html", {})
 
 def logoutDAQEQ(request):
 	logout(request)
 	return render(request, "plot/home.html", {})
 
-@login_required()
+@login_required(login_url="/plot/login/")
 def index(request):
 	files = sorted(map(lambda p : daqeq_home+'trunk/enviados/'+str(p), os.listdir(daqeq_home+'trunk/enviados')), key=os.path.getsize)
 	files = files + map(lambda p: daqeq_home+"trunk/"+str(p), os.listdir(daqeq_home+'trunk/'))
@@ -58,7 +58,7 @@ def formatData(request):
 		if buff:
 			return render(request, "plot/index.html", { "page_title" : "Visualización" , "plot" : True , "data" : buff })
 		else:
-			files = sorted( map(lambda p : '/home/pi/Desktop/daqeq/trunk/enviados/'+str(p), os.listdir('/home/pi/Desktop/daqeq/trunk/enviados')), key=os.path.getctime)
+			files = sorted(map(lambda p : '/home/pi/Desktop/daqeq/trunk/enviados/'+str(p), os.listdir('/home/pi/Desktop/daqeq/trunk/enviados')), key=os.path.getctime)
 			return render(request, 'plot/index.html', { "graph" : "Something to show, but no" , "file" : files[-1] })
 	else:
 		return render(request, 'plot/index.html',{ "graph" : "Nothing to show"})
@@ -109,17 +109,17 @@ def ask_daqeq_status():
 	else:
 		return "Error"
 
-@login_required()
+@login_required(login_url="/plot/login/")
 def view(request):
 	return render(request, 'plot/views.html', {})
 
-@login_required()
+@login_required(login_url="/plot/login/")
 def sensor(request):
 	genericSensor = ["A2-300693","pos1",1,0.001,0.001,1]
 	sensorList = [genericSensor, genericSensor, genericSensor]
 	return render(request, 'plot/sensors.html', { "sensores" : sensorList })
 
-@login_required()
+@login_required(login_url="/plot/login/")
 def configVerification(request):
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
@@ -134,9 +134,9 @@ def configVerification(request):
 			else:
 				command_server("etsf")
 			if "enableRecording" in request.POST:
-				os.popen("sudo python command_client.py erst")
+				command_server("erst")
 			else:
-				os.popen("sudo python command_client.py ersf")
+				command_server("ersf")
 			if request.POST["graphWindow"]:
 				command_server("ngs",request.POST["graphWindow"])
 			if request.POST["filterWindow"]:
@@ -155,14 +155,34 @@ def configVerification(request):
 				command_server("nps",request.POST["portNumber"])
 			if request.POST["filenameFormat"]:
 				command_server("sfs",request.POST["filenameFormat"])
-			# if request.POST["serverURL"]:
-			# 	command_server("sus",request.POST["serverURL"])
-			# if request.POST["networkName"]:
-			# 	command_server("sns",request.POST["networkName"])
-			# if request.POST["outputDir"]:
-			# 	command_server("sos",request.POST["outputDir"])
+			if request.POST["serverURL"]:
+				command_server("sus",request.POST["serverURL"])
+			if request.POST["networkName"]:
+				command_server("sns",request.POST["networkName"])
+			if request.POST["outputDir"]:
+				command_server("sos",request.POST["outputDir"])
 			command_server("0")
 		elif request.POST["this_url"] == "/plot/notification/":
+			if request.POST["sendFrequency"]:
+				command_server("nss",request.POST["sendFrequency"])
+			if request.POST["verificationFrequency"]:
+				command_server("nos",request.POST["verificationFrequency"])
+			if request.POST["username"]:
+				command_server("sis",request.POST["username"])
+			if request.POST["password"]:
+				command_server("sps",request.POST["password"])
+			if request.POST["structure"]:
+				command_server("sss",request.POST["structure"])
+			if request.POST["email"]:
+				command_server("ses",request.POST["email"])
+			if request.POST["phoneNumber"]:
+				command_server("sts",request.POST["phoneNumber"])
+			if request.POST["authenticationURL"]:
+				command_server("sas",request.POST["authenticationURL"])
+			if request.POST["recordURL"]:
+				command_server("srs",request.POST["recordURL"])
+			if request.POST["structHealthURL"]:
+				command_server("shs",request.POST["structHealthURL"])
 			if "sendSMS" in request.POST:
 				command_server("emst")
 			else:
@@ -179,10 +199,6 @@ def configVerification(request):
 				command_server("ehst")
 			else:
 				command_server("ehsf")
-			if request.POST["sendFrequency"]:
-				command_server("nss",request.POST["sendFrequency"])
-			if request.POST["verificationFrequency"]:
-				command_server("nos",request.POST["verificationFrequency"])
 			command_server("0")
 		else:
 			return request
@@ -201,8 +217,12 @@ class ConfigurationFormView(FormView):
 			self.initial['enableAutoStart'] = None
 		if command_server("etg") == "1":
 			self.initial['enableTrigger'] = 'on'
+		else:
+			self.initial['enableTrigger'] = None
 		if command_server("erg") == "1":
 			self.initial['enableRecording'] = 'on'
+		else:
+			self.initial['enableRecording'] = None
 		self.initial['graphWindow'] = command_server("ngg")
 		self.initial['filterWindow'] = command_server("nfg")
 		self.initial['preEventTime'] = command_server("nag")
@@ -212,6 +232,9 @@ class ConfigurationFormView(FormView):
 		self.initial['recordLength'] = command_server("nrg")
 		self.initial['portNumber'] = command_server("npg")
 		self.initial['filenameFormat'] = command_server("sfg")
+		self.initial['serverURL'] = command_server("sug")
+		self.initial['networkName'] = command_server("sng")
+		self.initial['outputDir'] = command_server("sog")
 		super(ConfigurationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
@@ -231,14 +254,30 @@ class NotificationFormView(FormView):
 		os.chdir(route)
 		if command_server("emg") == "1":
 			self.initial['sendSMS'] = 'on'
+		else:
+			self.initial['sendSMS'] = None
 		if command_server("esg") == "1":
 			self.initial['sendRecord'] = 'on'
+		else:
+			self.initial['sendRecord'] = None
 		if command_server("ecg") == "1":
 			self.initial['compressRecord'] = 'on'
+		else:
+			self.initial['compressRecord'] = None
 		if command_server("ehg") == "1":
 			self.initial['sendStructHealth'] = 'on'
+		else:
+			self.initial['sendStructHealth'] = None
 		self.initial["sendFrequency"] = command_server("nsg")
 		self.initial["verificationFrequency"] = command_server("nog")
+		self.initial["username"] = command_server("sig")
+		self.initial["password"] = command_server("spg")
+		self.initial["structure"] = command_server("ssg")
+		self.initial["email"] = command_server("seg")
+		self.initial["phoneNumber"] = command_server("stg")
+		self.initial["authenticationURL"] = command_server("sag")
+		self.initial["recordURL"] = command_server("srg")
+		self.initial["structHealthURL"] = command_server("shg")
 		super(NotificationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
