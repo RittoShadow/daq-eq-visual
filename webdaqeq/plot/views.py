@@ -117,7 +117,7 @@ def view(request):
 def sensor(request):
 	genericSensor = ["A2-300693","pos1",1,0.001,0.001,1]
 	sensorList = [genericSensor, genericSensor, genericSensor]
-	return render(request, 'plot/sensors.html', { "sensores" : sensorList })
+	return redirect("/plot/config/", { "sensors" : sensorList })
 
 @login_required(login_url="/plot/login/")
 def configVerification(request):
@@ -242,6 +242,7 @@ class ConfigurationFormView(FormView):
 		context["page_title"] = "Configuración"
 		context["this_url"] = "/plot/config/"
 		context["action_text"] = ask_daqeq_status()
+		context["sensors"] = command_server("cag")
 		return context
 
 
