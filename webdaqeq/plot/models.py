@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+import django.forms as forms
 from django.forms import ModelForm
 from django.core.validators import *
 from django.utils.translation import ugettext_lazy as _

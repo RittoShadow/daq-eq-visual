@@ -10,11 +10,43 @@
   {% block content %}
   {% if user.is_authenticated %}
     {% if action_text == "Reiniciar" %}
-    <form role="form" action="/plot/verify/" name="config" method="post" enctype="multipart/form-data" {% if layout != 'vertical' %}class="form-{{ layout }}"{% endif %}>
-        {% csrf_token %}
-        {% bootstrap_form form layout='horizontal' %}
-        <input type="hidden" name="this_url" value="{{this_url}}">
-        {% buttons submit='Guardar' reset="Cancelar" %}{% endbuttons %}
+    <form role="form" action="/plot/verify/" name="config" method="post" enctype="multipart/form-data" class="form-vertical col-md-12">
+        <div class="col-md-6">
+          {% csrf_token %}
+          {% bootstrap_form form layout='horizontal' %}
+          {% buttons submit='Guardar' reset="Cancelar" layout='horizontal' %}{% endbuttons %}
+          <input class="col-md-12" type="hidden" name="this_url" value="{{this_url}}">
+        </div>
+
+
+        <div class="col-md-6">
+          <h4>Sensores detectados</h4>
+          <div>
+            <table>
+              <tr>
+                <th>N° de serie</th>
+                <th>Posición</th>
+                <th>Detrend</th>
+                <th>Trigger(x,y,z):</th>
+                <th>Detrigger(x,y,z):</th>
+                <th>Votos:</th>
+              </tr>
+            {% for sensor in sensores %}
+              <tr>
+                {% for param in sensor %}
+                  <td>{{param}}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+            </table>
+          </div>
+          <button onclick="" class="glyphicon glyphicon-refresh"></button>
+          <h5>Agregar Manualmente</h5>
+          <form action="/plot/sensors/">
+            <input type="text" name="new_sensor">
+            <input type="submit" value="Agregar serie">
+          </form>
+        </div>
     </form>
     {% else %}
       <p>Para hacer cambios, debe detener la aplicación primero.</p>
