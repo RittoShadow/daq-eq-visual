@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.views.generic import FormView
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
@@ -115,9 +116,9 @@ def view(request):
 
 @login_required(login_url="/plot/login/")
 def sensor(request):
-	genericSensor = ["A2-300693","pos1",1,0.001,0.001,1]
-	sensorList = [genericSensor, genericSensor, genericSensor]
-	return redirect("/plot/config/", { "sensors" : sensorList })
+	sensor = command_server("cag")
+	print sensor
+	return JsonResponse(sensor, safe=False)
 
 @login_required(login_url="/plot/login/")
 def configVerification(request):
@@ -125,6 +126,7 @@ def configVerification(request):
 	os.chdir(route)
 	if request.method == "POST":
 		if request.POST["this_url"] == "/plot/config/":
+			sensorParams = ""
 			if "enableAutoStart" in request.POST:
 				command_server("east")
 			else:
@@ -161,6 +163,34 @@ def configVerification(request):
 				command_server("sns",request.POST["networkName"])
 			if request.POST["outputDir"]:
 				command_server("sos",request.POST["outputDir"])
+			if request.POST.getlist("serialNum"):
+				for i in range(len(request.POST.getlist("serialNum"))):
+					sensorParams = request.POST.getlist("serialNum")[i] + ";"
+					if request.POST.getlist("position")[i]:
+						sensorParams = sensorParams + request.POST.getlist("position")[i].strip(";") + ";"
+					if request.POST.getlist("triggerX")[i]:
+						sensorParams = sensorParams + request.POST.getlist("triggerX")[i].strip(";") + ";"
+					if request.POST.getlist("triggerY")[i]:
+						sensorParams = sensorParams + request.POST.getlist("triggerY")[i].strip(";") + ";"
+					if request.POST.getlist("triggerZ")[i]:
+						sensorParams = sensorParams + request.POST.getlist("triggerZ")[i].strip(";") + ";"
+					if request.POST.getlist("detriggerX")[i]:
+						sensorParams = sensorParams + request.POST.getlist("detriggerX")[i].strip(";") + ";"
+					if request.POST.getlist("detriggerY")[i]:
+						sensorParams = sensorParams + request.POST.getlist("detriggerY")[i].strip(";") + ";"
+					if request.POST.getlist("detriggerZ")[i]:
+						sensorParams = sensorParams + request.POST.getlist("detriggerZ")[i].strip(";") + ";"
+					if request.POST.getlist("detrend")[i]:
+						sensorParams = sensorParams + request.POST.getlist("detrend")[i].strip(";") + ";"
+					if request.POST.getlist("votesX")[i]:
+						sensorParams = sensorParams + request.POST.getlist("votesX")[i].strip(";") + ";"
+					if request.POST.getlist("votesY")[i]:
+						sensorParams = sensorParams + request.POST.getlist("votesY")[i].strip(";") + ";"
+					if request.POST.getlist("votesZ")[i]:
+						sensorParams = sensorParams + request.POST.getlist("votesZ")[i].strip(";") + ";"
+					if len(sensorParams.split(";"))==13:
+						print "Sending..."
+						command_server("cas",sensorParams)
 			command_server("0")
 		elif request.POST["this_url"] == "/plot/notification/":
 			if request.POST["sendFrequency"]:

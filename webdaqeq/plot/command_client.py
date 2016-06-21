@@ -65,6 +65,9 @@ def command_server(message, params=None):
                     return reply
                 reply.append(r.split(";")) #Guardo el sensor
                 s.sendall("k")
+        if message == "cas":
+            s.recv(4096)
+            s.sendall(params)
 
     except socket.error:
         #Send failed

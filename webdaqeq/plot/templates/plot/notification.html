@@ -2,7 +2,40 @@
 <html lang="es">
   {% extends 'plot/home.html' %}
   {% load bootstrap3 %}
-  <meta charset="utf-8">
+  {% load staticfiles %}
+
+  {% block meta %}
+    <meta charset="utf-8">
+    <script src="{% static "plot/js/jquery-1.12.3.min.js" %}"></script>
+    <script src="{% static "plot/js/djangoAjax.js" %}"></script>
+    <script type="text/javascript">
+
+      var sensorNums = [];
+      function addSerial(){
+        var serialNum = $("[name='new_sensor']")[0].value;
+        $.ajax({
+          url: '/plot/sensors/',
+          type: "POST",
+          async: false,
+          data: { newSensor : serialNum },
+          dataType: 'json',
+          success: function (response) {
+            //  $("sensor_table").addElement(serialNum);
+            var auxSensorNums = [];
+            $.each(response, function(i, value){
+                console.log(value[0]);
+                if(jQuery.inArray(value[0],sensorNums) == -1){
+                  //Añadir sensores
+                };
+                auxSensorNums.push(value[0]);
+            });
+            sensorNums = auxSensorNums;
+          }
+        });
+      }
+  </script>
+  {% endblock %}
+
   {% block title %}
     {{page_title}}
   {% endblock %}
@@ -10,40 +43,59 @@
   {% block content %}
   {% if user.is_authenticated %}
     {% if action_text == "Reiniciar" %}
-    <form role="form" action="/plot/verify/" name="config" method="post" enctype="multipart/form-data" class="form-horizontal">
+    <form role="form" action="/plot/verify/" name="config" method="post" enctype="multipart/form-data" class="form-horizontal col-md-12">
       <div class="row">
-        <div class="col-md-7">
+        <div class="col-md-6">
           {% csrf_token %}
           {% bootstrap_form form layout='horizontal' %}
-
         </div>
 
-        <div class="col-md-5 col-md-offset">
+        <div class="col-md-6">
           {% if this_url == "/plot/config/" %}
           <h4>Sensores detectados</h4>
-          <div>
-            <table class="col-md-12">
+          <div class="col-md-12">
+            <table id="sensor_table">
               <tr>
-                <th>N° de serie</th>
-                <th>Posición</th>
-                <th>Detrend</th>
-                <th>Trigger(x,y,z):</th>
-                <th>Detrigger(x,y,z):</th>
-                <th>Votos:</th>
+                <th class="col-md-1">N° de serie</th>
+                <th class="col-md-1">Posición</th>
+                <th class="col-md-1">Detrend</th>
+                <th class="col-md-3">Trigger(x,y,z):</th>
+                <th class="col-md-3">Detrigger(x,y,z):</th>
+                <th class="col-md-3">Votos:</th>
               </tr>
             {% for sensor in sensors %}
+              <script>
+                sensorNums.push('{{sensor.0}}')
+              </script>
               <tr>
-                {% for param in sensor %}
-                  <td>{{param}}</td>
-                {% endfor %}
+                <td class="col-md-1"><input type="text" name="serialNum" readonly="true" value="{{sensor.0}}"></td>
+                <td class="col-md-1"><input type="text" name="position" value="{{sensor.1}}"></td>
+                <td class="col-md-1"><input type="number" min=0 name="detrend" value={{sensor.8}}></td>
+                <td class="col-md-3">
+                  <input type="number" name="triggerX" min=0.01 step=0.01 value={{sensor.2}}>
+                  <input type="number" name="triggerY" min=0.01 step=0.01 value={{sensor.3}}>
+                  <input type="number" name="triggerZ" min=0.01 step=0.01 value={{sensor.4}}>
+                </td>
+                <td class="col-md-3">
+                  <input type="number" name="detriggerX" min=0.01 step=0.01 value={{sensor.5}}>
+                  <input type="number" name="detriggerY" min=0.01 step=0.01 value={{sensor.6}}>
+                  <input type="number" name="detriggerZ" min=0.01 step=0.01 value={{sensor.7}}>
+                </td>
+                <td class="col-md-3">
+                  <input type="number" name="votesX" min=0 value={{sensor.9}}>
+                  <input type="number" name="votesY" min=0 value={{sensor.10}}>
+                  <input type="number" name="votesZ" min=0 value={{sensor.11}}>
+                </td>
               </tr>
             {% endfor %}
             </table>
           </div>
-          <a href="/plot/sensors/" class="glyphicon glyphicon-refresh"></a>
-          <h5>Agregar Manualmente</h5>
-          <input type="text" name="new_sensor">
-          <input type="submit" value="Agregar serie">
+          <div>
+            <h4>Agregar Manualmente</h4>
+            <input type="text" name="new_sensor">
+            <input type="button" value="Agregar serie" onclick="addSerial()">
+            <a href="/plot/sensors/" class="glyphicon glyphicon-refresh"></a>
+          </div>
           {% endif %}
         </div>
       </div>
