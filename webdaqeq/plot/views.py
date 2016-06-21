@@ -116,6 +116,12 @@ def view(request):
 
 @login_required(login_url="/plot/login/")
 def sensor(request):
+	if request.POST['command'] == 'refresh':
+		command_server("elg")
+		print "Refresh"
+	elif request.POST['command'] == 'add':
+		command_server("sms", request.POST['serial'])
+		print "Adding new sensor"
 	sensor = command_server("cag")
 	print sensor
 	return JsonResponse(sensor, safe=False)
