@@ -56,6 +56,19 @@ def command_server(message, params=None):
         if re.search("s\ws", message):
             s.recv(4096)
             s.sendall(params)
+        if message == "cag": #Aviso que quiero sensores
+            reply = []
+            while True: #Recibo sensores hasta que me llegue una "r"
+                r = s.recv(4096) #Recibo datos de un sensor
+                if r == "r":
+                    s.sendall("k")
+                    return reply
+                reply.append(r.split(";")) #Guardo el sensor
+                s.sendall("k")
+        if message == "cas":
+            s.recv(4096)
+            s.sendall(params)
+
     except socket.error:
         #Send failed
         print 'Send failed'

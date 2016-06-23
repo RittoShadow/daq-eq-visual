@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+import django.forms as forms
 from django.forms import ModelForm
 from django.core.validators import *
 from django.utils.translation import ugettext_lazy as _
@@ -22,6 +23,9 @@ class Configuration(models.Model):
     networkName = models.CharField(default="Red0",max_length=50)
     enableAutoStart = models.BooleanField(default=False)
     outputDir = models.CharField(default="/home/",max_length=50)
+    allowClient = models.BooleanField(default=False)
+    username = models.CharField(max_length=20,blank=True)
+    password = models.CharField(max_length=20,blank=True)
 
 class Notification(models.Model):
     username = models.CharField(max_length=20,blank=True)
@@ -59,6 +63,9 @@ class configForm(ModelForm):
             'networkName': _('Nombre de Red:'),
             'enableAutoStart': _('Habilitar inicio automático'),
             'outputDir': _('Ruta destino:'),
+            'allowClient': _('Permitir configuración de cliente'),
+            'username': _('Usuario:'),
+            'password': _('Password:'),
         }
 
 class notifyForm(ModelForm):
