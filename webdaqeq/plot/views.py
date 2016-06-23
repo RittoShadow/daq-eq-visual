@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout
 
 import matplotlib
+import subprocess
 matplotlib.use('Agg')
 import netifaces as net
 import plot
@@ -91,8 +92,16 @@ def start_stop_signal(request):
 	# Obtener PID del proceso de app en c++ de daq-eq
 	pid = os.popen("pgrep 'RBA-DAQ-EQ'").read()
 	if (pid) :
-	    # Enviar signal SIG_USR1 a app en c++, para iniciar/detener adquirir datos
-		os.kill(int(pid), signal.SIGUSR1) # Unix version only...
+		if "command" in request.POST:
+			if request.POST["command"] == "stop":
+			    # Enviar signal SIG_USR1 a app en c++, para iniciar/detener adquirir datos
+				os.kill(int(pid), signal.SIGUSR1) # Unix version only...
+			elif request.POST["command"] == "start":
+				command_server("0")
+			elif request.POST["command"] == "trigger":
+				os.kill(int(pid), signal.SIGALRM)
+		else:
+			os.kill(int(pid), signal.SIGUSR1)
 	if request.POST["this_url"]:
 		return redirect(request.POST["this_url"])
 
@@ -102,6 +111,7 @@ def ask_daqeq_status():
 	# Obtener PID del proceso de app en c++ de daq-eq
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
+	#t = subprocess.Popen(["sudo","python","ask_daqeq_status.py"],stdout=PIPE)
 	result = int(os.popen("sudo python ask_daqeq_status.py").read().strip())
 	print "Result is: "+str(result)
 	if result == 0:
