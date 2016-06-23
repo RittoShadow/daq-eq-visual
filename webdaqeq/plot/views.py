@@ -103,6 +103,7 @@ def ask_daqeq_status():
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
 	result = int(os.popen("sudo python ask_daqeq_status.py").read().strip())
+	print "Result is: "+str(result)
 	if result == 0:
 		return "Reiniciar"
 	elif result == 1:
@@ -117,13 +118,12 @@ def view(request):
 @login_required(login_url="/plot/login/")
 def sensor(request):
 	if request.POST['command'] == 'refresh':
-		command_server("elg")
+		ans = command_server("elg")
 		print "Refresh"
 	elif request.POST['command'] == 'add':
-		command_server("sms", request.POST['serial'])
-		print "Adding new sensor"
+		ans = command_server("sms", request.POST['serial'])
+		return JsonResponse(ans.split(";"), safe=False)
 	sensor = command_server("cag")
-	print sensor
 	return JsonResponse(sensor, safe=False)
 
 @login_required(login_url="/plot/login/")
@@ -169,6 +169,7 @@ def configVerification(request):
 				command_server("sns",request.POST["networkName"])
 			if request.POST["outputDir"]:
 				command_server("sos",request.POST["outputDir"])
+			listSensorParams = []
 			if request.POST.getlist("serialNum"):
 				for i in range(len(request.POST.getlist("serialNum"))):
 					sensorParams = request.POST.getlist("serialNum")[i] + ";"
@@ -194,9 +195,18 @@ def configVerification(request):
 						sensorParams = sensorParams + request.POST.getlist("votesY")[i].strip(";") + ";"
 					if request.POST.getlist("votesZ")[i]:
 						sensorParams = sensorParams + request.POST.getlist("votesZ")[i].strip(";") + ";"
-					if len(sensorParams.split(";"))==13:
+					if "check"+request.POST.getlist("serialNum")[i] in request.POST:
+						sensorParams = sensorParams + "1;"
+					else:
+						sensorParams = sensorParams + "0;"
+					if request.POST["isRed"+request.POST.getlist("serialNum")[i]] == "true":
+						sensorParams = sensorParams + "1;"
+					else:
+						sensorParams = sensorParams + "0;"
+					if len(sensorParams.split(";"))==15:
 						print "Sending..."
-						command_server("cas",sensorParams)
+						listSensorParams.append(sensorParams)
+			command_server("cas",listSensorParams)
 			command_server("0")
 		elif request.POST["this_url"] == "/plot/notification/":
 			if request.POST["sendFrequency"]:
