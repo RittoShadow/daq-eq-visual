@@ -21,16 +21,19 @@
           dataType: 'json',
           success: function (response) {
             //  $("sensor_table").addElement(serialNum);
-            var auxSensorNums = [];
-            $.each(response, function(i, value){
-                console.log(value[0]);
-                if(jQuery.inArray(value[0],sensorNums) == -1){
-                  //Añadir sensores
-                };
-                auxSensorNums.push(value[0]);
-            });
-            sensorNums = auxSensorNums;
-          }
+            console.log(0)
+            switch(response[0]){
+              case "duplicated":
+                break;
+              case "k":
+                break;
+              default:
+                $("#sensor_table").append(newSensorRow(response));
+                sensorNums.push(response[0]);
+                break;
+              }
+
+            }
         });
       }
 
@@ -44,18 +47,105 @@
           success: function (response) {
             //  $("sensor_table").addElement(serialNum);
             var auxSensorNums = [];
+            $("#sensor_table").html('<tr><th class="col-xs-1">N° de serie</th><th class="col-xs-1">Posición</th><th class="col-xs-1">Detrend</th><th class="col-xs-3">Trigger(x,y,z):</th><th class="col-xs-3">Detrigger(x,y,z):</th><th class="col-xs-3">Votos:</th></tr>');
             $.each(response, function(i, value){
                 console.log(value[0]);
                 if(jQuery.inArray(value[0],sensorNums) == -1){
-                  //Añadir sensores
                 };
+                $("#sensor_table").append(newSensorRow(value))
                 auxSensorNums.push(value[0]);
             });
             sensorNums = auxSensorNums;
           }
         });
       }
+
+      function newSensorRow(value){
+        if (value[12] == "1"){
+          if (value[13] == "0"){
+            return '<tr>' +
+              '<input type="hidden" name="isRed'+value[0]+' "value="false">' +
+              '<td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" checked="checked" name="check' + value[0] + '"><input type="text" name="serialNum" readonly="true" value="' + value[0] + '">' +
+              '<td class="col-xs-1"><input type="text" name="position" value="' + value[1] + '">' +
+              '<td class="col-xs-1"><input type="number" min=0 name="detrend" value=' + value[8] + '>' +
+              '<td class="col-xs-3">' +
+                '<input type="number" name="triggerX" min=0.01 step=0.001 value=' + value[2] + '>' +
+                '<input type="number" name="triggerY" min=0.01 step=0.001 value=' + value[3] + '>' +
+                '<input type="number" name="triggerZ" min=0.01 step=0.001 value=' + value[4] + '>' +
+              '<td class="col-xs-3">' +
+                '<input type="number" name="detriggerX" min=0.01 step=0.001 value=' + value[5] + '>' +
+                '<input type="number" name="detriggerY" min=0.01 step=0.001 value=' + value[6] + '>' +
+                '<input type="number" name="detriggerZ" min=0.01 step=0.001 value=' + value[7] + '>' +
+              '<td class="col-xs-3">' +
+                '<input type="number" name="votesX" min=0 value=' + value[9] + '>' +
+                '<input type="number" name="votesY" min=0 value=' + value[10] + '>' +
+                '<input type="number" name="votesZ" min=0 value=' + value[11] + '>' +
+            '</tr>';
+          }
+          else{
+            return '<tr>' +
+              '<input type="hidden" name="isRed'+value[0]+' "value="true">' +
+              '<td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" checked="checked" name="check' + value[0] + '"><input type="text" class="text-danger" name="serialNum" readonly="true" value="' + value[0] + '">' +
+              '<td class="col-xs-1"><input type="text" class="text-danger" name="position" value="' + value[1] + '">' +
+              '<td class="col-xs-1"><input type="number" min=0 name="detrend" value=' + value[8] + '>' +
+              '<td class="col-xs-3">' +
+                '<input type="number" name="triggerX" min=0.01 step=0.001 value=' + value[2] + '>' +
+                '<input type="number" name="triggerY" min=0.01 step=0.001 value=' + value[3] + '>' +
+                '<input type="number" name="triggerZ" min=0.01 step=0.001 value=' + value[4] + '>' +
+              '<td class="col-xs-3">' +
+                '<input type="number" name="detriggerX" min=0.01 step=0.001 value=' + value[5] + '>' +
+                '<input type="number" name="detriggerY" min=0.01 step=0.001 value=' + value[6] + '>' +
+                '<input type="number" name="detriggerZ" min=0.01 step=0.001 value=' + value[7] + '>' +
+              '<td class="col-xs-3">' +
+                '<input type="number" name="votesX" min=0 value=' + value[9] + '>' +
+                '<input type="number" name="votesY" min=0 value=' + value[10] + '>' +
+                '<input type="number" name="votesZ" min=0 value=' + value[11] + '>' +
+            '</tr>';
+          }
+        }
+        else{
+          if (value[13] == "0"){
+            return '<tr>' +
+            '<input type="hidden" name="isRed'+value[0]+' "value="false">' +
+            '<td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" name="check' + value[0] + '"><input type="text" name="serialNum" readonly="true" value="' + value[0] + '">' +
+            '<td class="col-xs-1"><input type="text" name="position" value="' + value[1] + '">' +
+            '<td class="col-xs-1"><input type="number" min=0 name="detrend" value=' + value[8] + '>' +
+            '<td class="col-xs-3">' +
+              '<input type="number" name="triggerX" min=0.01 step=0.001 value=' + value[2] + '>' +
+              '<input type="number" name="triggerY" min=0.01 step=0.001 value=' + value[3] + '>' +
+              '<input type="number" name="triggerZ" min=0.01 step=0.001 value=' + value[4] + '>' +
+            '<td class="col-xs-3">' +
+              '<input type="number" name="detriggerX" min=0.01 step=0.001 value=' + value[5] + '>' +
+              '<input type="number" name="detriggerY" min=0.01 step=0.001 value=' + value[6] + '>' +
+              '<input type="number" name="detriggerZ" min=0.01 step=0.001 value=' + value[7] + '>' +
+            '<td class="col-xs-3">' +
+              '<input type="number" name="votesX" min=0 value=' + value[9] + '>' +
+              '<input type="number" name="votesY" min=0 value=' + value[10] + '>' +
+              '<input type="number" name="votesZ" min=0 value=' + value[11] + '>' +
+          '</tr>';
+          }
+          else{
+            return "";
+          }
+        }
+      }
   </script>
+  <style type="text/css">
+
+    .icon-input-btn{
+
+        display: inline-block;
+        position: relative;
+    }
+
+    .icon-input-btn .glyphicon{
+
+        display: inline-block;
+        position: absolute;
+        left: 0.35em;
+        top: 30%;
+    }
+    </style>
   {% endblock %}
 
   {% block title %}
@@ -72,9 +162,10 @@
           {% bootstrap_form form layout='horizontal' %}
         </div>
 
-        <--Alguien por favor haga esta página hermosa, porque no puedo.-->
+        <!--Alguien por favor haga esta página hermosa, porque no puedo.
+            Es cosa de ponerle CSS con ganas para que quepan las cosas en una fila.-->
 
-        <div class="col-xs-6">
+        <div class="col-xs-5 col-xs-offset-1">
           {% if this_url == "/plot/config/" %}
           <h4>Sensores detectados</h4>
           <div class="col-xs-12">
@@ -87,14 +178,14 @@
                 <th class="col-xs-3">Detrigger(x,y,z):</th>
                 <th class="col-xs-3">Votos:</th>
               </tr>
-            <div id="sensorInfo">
             {% for sensor in sensors %}
               <script>
                 sensorNums.push('{{sensor.0}}')
               </script>
               <tr>
-                <td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" id='{{sensor.0}}'><input type="text" name="serialNum" readonly="true" value="{{sensor.0}}">
-                <td class="col-xs-1"><input type="text" name="position" value="{{sensor.1}}">
+                <input type="hidden" name="isRed{{sensor.0}}" value={% if sensor.13 == "1" %}"true"{% else %}"false"{% endif %}>
+                <td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" name="check{{sensor.0}}" {% if sensor.12 == "1" %}checked="checked"{% endif %}><input type="text" name="serialNum" {% if sensor.13 == "1" %}class="text-danger"{% endif %} readonly="true" value="{{sensor.0}}">
+                <td class="col-xs-1"><input type="text" {% if sensor.13 == "1" %}class="text-danger"{% endif %} name="position" value="{{sensor.1}}">
                 <td class="col-xs-1"><input type="number" min=0 name="detrend" value={{sensor.8}}>
                 <td class="col-xs-3">
                   <input type="number" name="triggerX" min=0.01 step=0.001 value={{sensor.2}}>
@@ -111,14 +202,13 @@
               </tr>
 
             {% endfor %}
-            </div>
             </table>
           </div>
           <div>
             <h4>Agregar Manualmente</h4>
             <input type="text" name="new_sensor">
             <input type="button" value="Agregar serie" onclick="addSerial()">
-            <button class="glyphicon glyphicon-refresh" onclick="refreshSerial()"></button>
+            <span class="icon-input-btn"><span class="glyphicon glyphicon-refresh inline"></span><input type="button" onclick="refreshSerial()"></span>
           </div>
           {% endif %}
         </div>
@@ -132,7 +222,7 @@
       <p>Para hacer cambios, debe detener la aplicación primero.</p>
       <form role="form" method="post" action="/plot/signal/">
         {% csrf_token %}
-        <div class="row col-md-offset-1">
+        <div class="row">
           <input class="btn btn-primary col-md-1" name="action" type="submit" value="{{action_text}}">
           <input class="btn btn-success col-md-1" name="action" type="button" value="Trigger">
           {% buttons reset="Cancelar" layout='vertical' %}{% endbuttons %}

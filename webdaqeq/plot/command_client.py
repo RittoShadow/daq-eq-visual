@@ -67,7 +67,10 @@ def command_server(message, params=None):
                 s.sendall("k")
         if message == "cas":
             s.recv(4096)
-            s.sendall(params)
+            for sensor in params:
+                s.sendall(sensor)
+                s.recv(4096)
+            s.sendall("k")
 
     except socket.error:
         #Send failed
