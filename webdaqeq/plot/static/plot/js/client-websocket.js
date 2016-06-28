@@ -8,6 +8,7 @@ var buffer_z = [];
 var buffers = [];
 var count = 0;
 var sensor_charts = [];
+var chart = null;
 
 /* adjust decimals with floating point in account */
 function decimalAdjust(type, value, exp) {
@@ -46,7 +47,7 @@ $(function () {
   };
   ws.onmessage = function(evt) {
     var aux = JSON.parse(evt.data);
-    console.log(aux);
+ 
     var type = aux['type'];
     if (type == 'config') {
       sensors = aux['nombre_sensores'];
@@ -64,51 +65,69 @@ $(function () {
           sensor_charts[index]['z'] = setupGraph(setChartName(index,'z'), "blue");
         });
         ws.send("sensors ok");
+        chart = setupMainGraph("updating-chart", sensors);
       }
+
     }
     else if (type == 'data') {
       aux = aux['data'];
-      var new_x = [];
-      var new_y = [];
-      var new_z = [];
-      var max_x = 0.01;
-      var max_y = 0.01;
-      var max_z = 0.01;
       $.each(aux, function(index, e) {
-        var aux2 = e.split(';');
-        var time_stamp = parseFloat(aux2[1]);
-        var x = parseFloat(aux2[2]);
-        var y = parseFloat(aux2[3]);
-        var z = parseFloat(aux2[4]);
-        
-        if (Math.abs(x) > max_x) max_x = Math.ceil10(x,-2);
-        if (Math.abs(y) > max_y) max_y = Math.ceil10(y,-2);
-        if (Math.abs(z) > max_z) max_z = Math.ceil10(z,-2);
+        var new_x = [];
+        var new_y = [];
+        var new_z = [];
+        var max_x = 0.01;
+        var max_y = 0.01;
+        var max_z = 0.01;
+        var time_stamp_array = [];
+        var first_timestamp = true;
+        $.each(e, function(index2, s_data) {
+          var aux2 = s_data.split(';');
+          // var time_stamp = parseFloat(aux2[1]);
+          // if (first_timestamp) {
+            time_stamp = parseFloat(aux2[1]);
+            first_timestamp = false;
+          // }
+          var x = parseFloat(aux2[2]);
+          var y = parseFloat(aux2[3]);
+          var z = parseFloat(aux2[4]);
 
-        new_x.push({x: time_stamp, y: x});
-        new_y.push({x: time_stamp, y: y});
-        new_z.push({x: time_stamp, y: z});
+          if (Math.abs(x) > max_x) max_x = Math.ceil10(x,-2);
+          if (Math.abs(y) > max_y) max_y = Math.ceil10(y,-2);
+          if (Math.abs(z) > max_z) max_z = Math.ceil10(z,-2);
+
+          new_x.push({x: time_stamp, y: x});
+          new_y.push({x: time_stamp, y: y});
+          new_z.push({x: time_stamp, y: z});
+        });
+        buffers[index] = {};
+        buffers[index]['x'] = {};
+        buffers[index]['y'] = {};
+        buffers[index]['z'] = {};
+        buffers[index]['x']['data'] = new_x;
+        buffers[index]['y']['data'] = new_y;
+        buffers[index]['z']['data'] = new_z;
+        buffers[index]['x']['max'] = max_x;
+        buffers[index]['y']['max'] = max_y;
+        buffers[index]['z']['max'] = max_z;
       });
-      buffer_x['data'] = new_x;
-      buffer_x['max'] = max_x;
-      buffer_y['data'] = new_y;
-      buffer_y['max'] = max_y;
-      buffer_z['data'] = new_z;
-      buffer_z['max'] = max_z;
-
-      // buffers[sensor]['x']['data'] = new_x;
-      // buffers[sensor]['y']['data'] = new_y;
-      // buffers[sensor]['z']['data'] = new_z;
-      // buffers[sensor]['x']['max'] = max_x;
-      // buffers[sensor]['y']['max'] = max_y;
-      // buffers[sensor]['z']['max'] = max_z;
-
+      if ($("#main-chart").hasClass("active")) {
+        updateChart();
+      }
+      // updateChart();
+      var i = 0;
+      // updateMainChart(chart, sensors);
       updateChart();
-      $.each(sensor_charts, function(index, chart) {
-        updateChartPlot(chart['x'], buffer_x);
-        updateChartPlot(chart['y'], buffer_y);
-        updateChartPlot(chart['z'], buffer_z);
+      $.each(sensor_charts, function(index, chart) {     
+        var sensor_name = sensors[i];
+        if ($("#" + sensor_name).hasClass("active")) {
+          updateChartPlot(chart['x'], buffers[sensor_name]['x']);
+          updateChartPlot(chart['y'], buffers[sensor_name]['y']);
+          updateChartPlot(chart['z'], buffers[sensor_name]['z']);
+        }
+        
+        i = i + 1;
       });
+      
     }
     else if (type == 'status') {
 
@@ -126,7 +145,7 @@ $(function () {
     conn_status.text("Desconectado.");
   };
   function addTab(number, name) {
-    var element = '<li><a data-toggle="tab" href="#sensor' +
+    var element = '<li id="'+ name +'"><a data-toggle="tab" href="#sensor' +
                     (number + 1) + '">Sensor ' + name + '</a></li>';
     $(".sensor-tabs").append(element);
   };
@@ -161,12 +180,7 @@ $(function () {
   };
 
   function setupGraph(canvas_id, color ) {
-    var x = [
-      {x: 0, y: 2},
-      {x: 1, y: 2},
-      {x: 2, y: 2},
-      {x: 3, y: 2},
-      {x: 4, y: 2}];
+    var x = [];
     var sensor_chart_x = new CanvasJS.Chart(canvas_id, {
       axisX: config_axisX,
       axisY: {            
@@ -186,6 +200,67 @@ $(function () {
     });
     sensor_chart_x.render();
     return sensor_chart_x;
+  };
+
+  function genInitData(sensors) {
+    var data = [];
+    var i = 0;
+    while (i < sensors.length) {
+      var obj_x = {
+        type: "line",
+        dataPoints: [],
+        color: "red",
+        lineThickness: 1,
+      };
+      var obj_y = {
+        type: "line",
+        dataPoints: [],
+        color: "green",
+        lineThickness: 1,
+      };
+      var obj_z = {
+        type: "line",
+        dataPoints: [],
+        color: "blue",
+        lineThickness: 1,
+      };
+      data.push(obj_x);
+      data.push(obj_y);
+      data.push(obj_z);
+      i = i + 1;
+    }
+    return data;
+  };
+
+  function setupMainGraph(canvas_id, sensors) {
+    var mainChart = new CanvasJS.Chart(canvas_id, {
+      axisX: config_axisX,
+      axisY: {
+        title: "Aceleración (g)",
+        labelFontSize: 10,
+        titleFontSize: 15,
+      },
+      data: genInitData(sensors),
+
+    });
+    mainChart.render();
+    return mainChart;
+  };
+
+  function updateMainChart(chart, sensor_array) {
+
+    $.each(sensor_array, function(index, sensor) {
+      // chart.options.data[0]['dataPoints'] = buffers[sensor]['x']['data'];
+      // chart.options.data[1]['dataPoints'] = buffers[sensor]['y']['data'];
+      // chart.options.data[2]['dataPoints'] = buffers[sensor]['z']['data'];
+      chart.options.data[index*3]['dataPoints'] = buffers[sensor]['x']['data'];
+      chart.options.data[index*3 + 1]['dataPoints'] = buffers[sensor]['y']['data'];
+      chart.options.data[index*3 + 2]['dataPoints'] = buffers[sensor]['z']['data'];
+    });
+    // chart.options.data[0]['dataPoints'] = buffers[sensor_array[0]]['x']['data'];
+    // chart.options.data[1]['dataPoints'] = buffers[sensor_array[0]]['y']['data'];
+    // chart.options.data[2]['dataPoints'] = buffers[sensor_array[0]]['z']['data'];
+    chart.render();
   }
 
   function updateChartPlot(chart, dataset) {
@@ -196,68 +271,55 @@ $(function () {
     chart.render();
   }
 
-  var x = [
-    {x: 0, y: 2},
-    {x: 1, y: 2},
-    {x: 2, y: 2},
-    {x: 3, y: 2},
-    {x: 4, y: 2}];   //dataPoints. 
-  var y = [
-    {x: 0, y: 2},
-    {x: 1, y: 2},
-    {x: 2, y: 2},
-    {x: 3, y: 2},
-    {x: 4, y: 2}];   //dataPoints. 
-  var z = [
-    {x: 0, y: 2},
-    {x: 1, y: 2},
-    {x: 2, y: 2},
-    {x: 3, y: 2},
-    {x: 4, y: 2}];   //dataPoints. 
+  var data_main = [];
+  // $.each(sensors, function())
 
-  var chart = new CanvasJS.Chart("updating-chart",{
-    axisX: config_axisX,
-    axisY: {            
-      title: "Aceleración (g)",
-      labelFontSize: 10,
-      titleFontSize: 15
-    },
-    data: [
-    {
-      type: "line",
-      dataPoints : x,
-      color: "red",
-      lineThickness: 1,
-    }, 
-    {
-      type: "line",
-      dataPoints : y,
-      color: "green",
-      lineThickness: 1,
-    }, 
-    {
-      type: "line",
-      dataPoints : z,
-      color: "blue",
-      lineThickness: 1,
-    }, 
+  // var chart = new CanvasJS.Chart("updating-chart",{
+  //   axisX: config_axisX,
+  //   axisY: {            
+  //     title: "Aceleración (g)",
+  //     labelFontSize: 10,
+  //     titleFontSize: 15
+  //   },
+  //   data: [
+  //   {
+  //     type: "line",
+  //     dataPoints : [],
+  //     color: "red",
+  //     lineThickness: 1,
+  //   }, 
+  //   {
+  //     type: "line",
+  //     dataPoints : [],
+  //     color: "green",
+  //     lineThickness: 1,
+  //   }, 
+  //   {
+  //     type: "line",
+  //     dataPoints : [],
+  //     color: "blue",
+  //     lineThickness: 1,
+  //   }, 
 
-    ]
-  });
+  //   ]
+  // });
 
-  chart.render();
+  // chart.render();
+
+  // var chart = setupMainGraph()
 
   var updateChart = function () {
-    var buf_x = buffer_x;
-    var buf_y = buffer_y;
-    var buf_z = buffer_z;
-    chart.options.data[0]['dataPoints'] = buf_x['data'];
-    chart.options.data[1]['dataPoints'] = buf_y['data'];
-    chart.options.data[2]['dataPoints'] = buf_z['data'];
-    var max = Math.max.apply(Math, [buf_x['max'], buf_y['max'], buf_z['max']]);
+    // var buf_x = buffer_x;
+    // var buf_y = buffer_y;
+    // var buf_z = buffer_z;
+    // chart.options.data[0]['dataPoints'] = buf_x['data'];
+    // chart.options.data[1]['dataPoints'] = buf_y['data'];
+    // chart.options.data[2]['dataPoints'] = buf_z['data'];
+    // var max = Math.max.apply(Math, [buf_x['max'], buf_y['max'], buf_z['max']]);
 
-    chart.options.axisY['maximum'] = max;
-    chart.options.axisY['minimum'] = -1 * max;
-    chart.render();
+    // chart.options.axisY['maximum'] = max;
+    // chart.options.axisY['minimum'] = -1 * max;
+    // chart.render();
+    updateMainChart(chart, sensors);
   };
 });
