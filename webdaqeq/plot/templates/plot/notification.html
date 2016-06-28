@@ -129,6 +129,10 @@
           }
         }
       }
+
+      function secondTrigger(){
+        $("[name='secondTriggerThresh']")[0].disabled = !$("[name='enableSecondTrigger']")[0].checked;
+      }
   </script>
   <style type="text/css">
 
@@ -160,6 +164,22 @@
         <div class="form-group col-sm-5">
           {% csrf_token %}
           {% bootstrap_form form layout='horizontal' %}
+          <div class="form-group">
+            <label class="col-md-3 control-label" for="id_enableSecondTrigger">&#160;</label>
+            <div class="col-md-9">
+              <div class="checkbox">
+                <label for="id_enableSecondTrigger">
+                  <input id="id_enableSecondTrigger" name="enableSecondTrigger" {% if secondTrigger %}checked="checked"{% endif %} type="checkbox" onchange="secondTrigger()"/> Habilitar segundo trigger
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label" for="id_secondTriggerThresh">Umbral segundo trigger</label>
+            <div class="col-md-9">
+              <input id="id_secondTriggerThresh" min=0.01 step=0.001 value={{ secondTriggerThresh }} name="secondTriggerThresh" {% if secondTrigger %}disabled="false"{% endif %} type="number"/>
+            </div>
+          </div>
         </div>
 
         <!--Alguien por favor haga esta página hermosa, porque no puedo.

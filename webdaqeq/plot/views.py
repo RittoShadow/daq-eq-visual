@@ -155,6 +155,10 @@ def configVerification(request):
 				command_server("erst")
 			else:
 				command_server("ersf")
+			if request.POST["enableSecondTrigger"]:
+				command_server("enst")
+			else:
+				command_server("ensf")
 			if request.POST["graphWindow"]:
 				command_server("ngs",request.POST["graphWindow"])
 			if request.POST["filterWindow"]:
@@ -179,6 +183,8 @@ def configVerification(request):
 				command_server("sns",request.POST["networkName"])
 			if request.POST["outputDir"]:
 				command_server("sos",request.POST["outputDir"])
+			if request.POST["secondTriggerThresh"]:
+				command_server("nts",request.POST["secondTriggerThresh"])			
 			listSensorParams = []
 			if request.POST.getlist("serialNum"):
 				for i in range(len(request.POST.getlist("serialNum"))):
@@ -299,6 +305,11 @@ class ConfigurationFormView(FormView):
 		context["this_url"] = "/plot/config/"
 		context["action_text"] = ask_daqeq_status()
 		context["sensors"] = command_server("cag")
+		context["secondTriggerThresh"] = command_server("ntg")
+		if command_server("eng") == "1":
+			context["secondTrigger"] = True
+		else:
+			context["secondTrigger"] = False
 		return context
 
 
