@@ -114,7 +114,7 @@ def ask_daqeq_status():
 	result = 0
 	try:
 		result = int(subprocess.Popen(["sudo","python","ask_daqeq_status.py"], stdout=subprocess.PIPE).stdout.read().strip())
-	except TypeError:
+	except ValueError:
 		result = -1
 	if result == 0:
 		return "Reiniciar"
@@ -159,6 +159,8 @@ def configVerification(request):
 				command_server("ersf")
 			if "enableSecondTrigger" in request.POST:
 				command_server("enst")
+				# if request.POST["secondTriggerThresh"]:
+				# 	command_server("nts",request.POST["secondTriggerThresh"])
 			else:
 				command_server("ensf")
 			if request.POST["graphWindow"]:
@@ -185,9 +187,6 @@ def configVerification(request):
 				command_server("sns",request.POST["networkName"])
 			if request.POST["outputDir"]:
 				command_server("sos",request.POST["outputDir"])
-			if request.POST["secondTriggerThresh"]:
-				print "Second trigger threshold is: "+request.POST["secondTriggerThresh"]
-				command_server("nts",request.POST["secondTriggerThresh"])
 			listSensorParams = []
 			if request.POST.getlist("serialNum"):
 				for i in range(len(request.POST.getlist("serialNum"))):
@@ -222,7 +221,13 @@ def configVerification(request):
 						sensorParams = sensorParams + "1;"
 					else:
 						sensorParams = sensorParams + "0;"
-					if len(sensorParams.split(";"))==15:
+					if request.POST.getlist("secondTriggerX")[i]:
+						sensorParams = sensorParams + request.POST.getlist("secondTriggerX")[i].strip(";") + ";"
+					if request.POST.getlist("secondTriggerY")[i]:
+						sensorParams = sensorParams + request.POST.getlist("secondTriggerY")[i].strip(";") + ";"
+					if request.POST.getlist("secondTriggerZ")[i]:
+						sensorParams = sensorParams + request.POST.getlist("secondTriggerZ")[i].strip(";") + ";"
+					if len(sensorParams.split(";"))==18:
 						print "Sending..."
 						listSensorParams.append(sensorParams)
 			command_server("cas",listSensorParams)
@@ -309,8 +314,7 @@ class ConfigurationFormView(FormView):
 		context["action_text"] = ask_daqeq_status()
 		command_server("elg")
 		context["sensors"] = command_server("cag")
-		print "I receive: "+command_server("ntg")
-		context["secondTriggerThresh"] = command_server("ntg")
+		context["secondTriggerThresh"] = 1
 		if command_server("eng") == "1":
 			context["secondTrigger"] = True
 		else:

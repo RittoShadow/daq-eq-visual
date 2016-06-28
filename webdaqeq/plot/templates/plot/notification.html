@@ -61,8 +61,8 @@
       }
 
       function newSensorRow(value){
-        if (value[12] == "1"){
-          if (value[13] == "0"){
+        if (value[15] == "1"){
+          if (value[16] == "0"){
             return '<tr>' +
               '<input type="hidden" name="isRed'+value[0]+' "value="false">' +
               '<td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" checked="checked" name="check' + value[0] + '"><input type="text" name="serialNum" readonly="true" value="' + value[0] + '">' +
@@ -76,10 +76,14 @@
                 '<input type="number" name="detriggerX" min=0.01 step=0.001 value=' + value[5] + '>' +
                 '<input type="number" name="detriggerY" min=0.01 step=0.001 value=' + value[6] + '>' +
                 '<input type="number" name="detriggerZ" min=0.01 step=0.001 value=' + value[7] + '>' +
-              '<td class="col-xs-3">' +
+              '<td class="col-xs-2">' +
                 '<input type="number" name="votesX" min=0 value=' + value[9] + '>' +
                 '<input type="number" name="votesY" min=0 value=' + value[10] + '>' +
                 '<input type="number" name="votesZ" min=0 value=' + value[11] + '>' +
+              '<td class="col-xs-1">' +
+                  '<input type="number" name="secondTriggerX" min=0.01 step=0.001 value=' + value[12] + '>' +
+                  '<input type="number" name="secondTriggerY" min=0.01 step=0.001 value=' + value[13] + '>' +
+                  '<input type="number" name="secondTriggerZ" min=0.01 step=0.001 value=' + value[14] + '>' +
             '</tr>';
           }
           else{
@@ -96,15 +100,19 @@
                 '<input type="number" name="detriggerX" min=0.01 step=0.001 value=' + value[5] + '>' +
                 '<input type="number" name="detriggerY" min=0.01 step=0.001 value=' + value[6] + '>' +
                 '<input type="number" name="detriggerZ" min=0.01 step=0.001 value=' + value[7] + '>' +
-              '<td class="col-xs-3">' +
+              '<td class="col-xs-2">' +
                 '<input type="number" name="votesX" min=0 value=' + value[9] + '>' +
                 '<input type="number" name="votesY" min=0 value=' + value[10] + '>' +
                 '<input type="number" name="votesZ" min=0 value=' + value[11] + '>' +
+              '<td class="col-xs-1">' +
+                  '<input type="number" name="secondTriggerX" min=0.01 step=0.001 value=' + value[12] + '>' +
+                  '<input type="number" name="secondTriggerY" min=0.01 step=0.001 value=' + value[13] + '>' +
+                  '<input type="number" name="secondTriggerZ" min=0.01 step=0.001 value=' + value[14] + '>' +
             '</tr>';
           }
         }
         else{
-          if (value[13] == "0"){
+          if (value[15] == "0"){
             return '<tr>' +
             '<input type="hidden" name="isRed'+value[0]+' "value="false">' +
             '<td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" name="check' + value[0] + '"><input type="text" name="serialNum" readonly="true" value="' + value[0] + '">' +
@@ -118,10 +126,14 @@
               '<input type="number" name="detriggerX" min=0.01 step=0.001 value=' + value[5] + '>' +
               '<input type="number" name="detriggerY" min=0.01 step=0.001 value=' + value[6] + '>' +
               '<input type="number" name="detriggerZ" min=0.01 step=0.001 value=' + value[7] + '>' +
-            '<td class="col-xs-3">' +
+            '<td class="col-xs-2">' +
               '<input type="number" name="votesX" min=0 value=' + value[9] + '>' +
               '<input type="number" name="votesY" min=0 value=' + value[10] + '>' +
               '<input type="number" name="votesZ" min=0 value=' + value[11] + '>' +
+            '<td class="col-xs-1">' +
+              '<input type="number" name="secondTriggerX" min=0.01 step=0.001 value=' + value[12] + '>' +
+              '<input type="number" name="secondTriggerY" min=0.01 step=0.001 value=' + value[13] + '>' +
+              '<input type="number" name="secondTriggerZ" min=0.01 step=0.001 value=' + value[14] + '>' +
           '</tr>';
           }
           else{
@@ -174,12 +186,6 @@
               </div>
             </div>
           </div>
-          <div class="form-group">
-            <label class="col-md-3 control-label" for="id_secondTriggerThresh">Umbral segundo trigger</label>
-            <div class="col-md-9">
-              <input id="id_secondTriggerThresh" min=0.01 step=0.001 value={{secondTriggerThresh}} name="secondTriggerThresh" {% if not secondTrigger %}disabled="true"{% endif %} type="number"/>
-            </div>
-          </div>
         </div>
 
         <!--Alguien por favor haga esta página hermosa, porque no puedo.
@@ -196,16 +202,34 @@
                 <th class="col-xs-1">Detrend</th>
                 <th class="col-xs-3">Trigger(x,y,z):</th>
                 <th class="col-xs-3">Detrigger(x,y,z):</th>
-                <th class="col-xs-3">Votos:</th>
+                <th class="col-xs-2">Votos:</th>
+                <th class="col-xs-1">Second trigger(x,y,z):</th>
+              </tr>
+              <tr>
+                <td class="col-xs-1">
+                <td class="col-xs-1">
+                <td class="col-xs-1">
+                <td class="col-xs-3">
+                  <input type="number" name="triggerXYZ" min=0.01 step=0.001 value=0.01>
+                  <input type="button" name="setTrigger" value="Set" onclick=secondTrigger()>
+                <td class="col-xs-3">
+                  <input type="number" name="detriggerXYZ" min=0.01 step=0.001 value=0.01>
+                  <input type="button" name="setDetrigger" value="Set" onclick=secondTrigger()>
+                <td class="col-xs-2">
+                  <input type="number" name="votesXYZ" min=0 value=1>
+                  <input type="button" name="setVotes" value="Set" onclick=secondTrigger()>
+                <td class="col-xs-1">
+                    <input type="number" name="secondTriggerXYZ" min=0.01 step=0.001 value={{secondTriggerThresh}}>
+                    <input type="button" name="setSecondTrigger" value="Set" onclick=secondTrigger()>
               </tr>
             {% for sensor in sensors %}
               <script>
                 sensorNums.push('{{sensor.0}}')
               </script>
               <tr>
-                <input type="hidden" name="isRed{{sensor.0}}" value={% if sensor.13 == "1" %}"true"{% else %}"false"{% endif %}>
-                <td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" name="check{{sensor.0}}" {% if sensor.12 == "1" %}checked="checked"{% endif %}><input type="text" name="serialNum" {% if sensor.13 == "1" %}class="text-danger"{% endif %} readonly="true" value="{{sensor.0}}">
-                <td class="col-xs-1"><input type="text" {% if sensor.13 == "1" %}class="text-danger"{% endif %} name="position" value="{{sensor.1}}">
+                <input type="hidden" name="isRed{{sensor.0}}" value={% if sensor.16 == "1" %}"true"{% else %}"false"{% endif %}>
+                <td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" name="check{{sensor.0}}" {% if sensor.15 == "1" %}checked="checked"{% endif %}><input type="text" name="serialNum" {% if sensor.16 == "1" %}class="text-danger"{% endif %} readonly="true" value="{{sensor.0}}">
+                <td class="col-xs-1"><input type="text" {% if sensor.16 == "1" %}class="text-danger"{% endif %} name="position" value="{{sensor.1}}">
                 <td class="col-xs-1"><input type="number" min=0 name="detrend" value={{sensor.8}}>
                 <td class="col-xs-3">
                   <input type="number" name="triggerX" min=0.01 step=0.001 value={{sensor.2}}>
@@ -215,10 +239,14 @@
                   <input type="number" name="detriggerX" min=0.01 step=0.001 value={{sensor.5}}>
                   <input type="number" name="detriggerY" min=0.01 step=0.001 value={{sensor.6}}>
                   <input type="number" name="detriggerZ" min=0.01 step=0.001 value={{sensor.7}}>
-                <td class="col-xs-3">
+                <td class="col-xs-2">
                   <input type="number" name="votesX" min=0 value={{sensor.9}}>
                   <input type="number" name="votesY" min=0 value={{sensor.10}}>
                   <input type="number" name="votesZ" min=0 value={{sensor.11}}>
+                <td class="col-xs-1">
+                  <input type="number" name="secondTriggerX" min=0.01 step=0.001 value={{sensor.12}}>
+                  <input type="number" name="secondTriggerY" min=0.01 step=0.001 value={{sensor.13}}>
+                  <input type="number" name="secondTriggerZ" min=0.01 step=0.001 value={{sensor.14}}>
               </tr>
 
             {% endfor %}
