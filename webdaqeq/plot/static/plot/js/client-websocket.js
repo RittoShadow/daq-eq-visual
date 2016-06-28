@@ -38,8 +38,7 @@ if (!Math.ceil10) {
 
 $(function () {
     //change example.com with your IP or your host
-  // var ws = new WebSocket("ws://192.168.1.227:7000/ws");
-  var ws = new WebSocket("ws://"+ $('#websocket-ip').val() +":7000/ws");
+  var ws = new WebSocket("ws://localhost:7000/ws");
   ws.onopen = function(evt) {
     var conn_status = $('#conn_text');
     conn_status.removeClass('label-danger');
@@ -84,11 +83,11 @@ $(function () {
         var i = 0;
         $.each(e, function(index2, s_data) {
           var aux2 = s_data.split(';');
-          // var time_stamp = parseFloat(aux2[1]);
-          if (first_timestamp) {
-            time_stamp_array.push(parseFloat(aux2[1]));
+          var time_stamp = parseFloat(aux2[1]);
+          // if (first_timestamp) {
+          //   time_stamp_array.push(parseFloat(aux2[1]));
             
-          }
+          // }
           var x = parseFloat(aux2[2]);
           var y = parseFloat(aux2[3]);
           var z = parseFloat(aux2[4]);
@@ -97,9 +96,12 @@ $(function () {
           if (Math.abs(y) > max_y) max_y = Math.ceil10(y,-2);
           if (Math.abs(z) > max_z) max_z = Math.ceil10(z,-2);
 
-          new_x.push({x: time_stamp_array[i], y: x});
-          new_y.push({x: time_stamp_array[i], y: y});
-          new_z.push({x: time_stamp_array[i], y: z});
+          new_x.push({x: time_stamp, y: x});
+          new_y.push({x: time_stamp, y: y});
+          new_z.push({x: time_stamp, y: z});
+          // new_x.push({x: time_stamp_array[i], y: x});
+          // new_y.push({x: time_stamp_array[i], y: y});
+          // new_z.push({x: time_stamp_array[i], y: z});
         });
         buffers[index] = {};
         buffers[index]['x'] = {};
@@ -111,9 +113,11 @@ $(function () {
         buffers[index]['x']['max'] = max_x;
         buffers[index]['y']['max'] = max_y;
         buffers[index]['z']['max'] = max_z;
+        i = i + 1;
+        first_timestamp = false;
       });
       first_timestamp = false;
-      i = i + 1;
+
       if ($("#main-chart").hasClass("active")) {
         updateChart();
       }
