@@ -52,11 +52,24 @@
                 console.log(value[0]);
                 if(jQuery.inArray(value[0],sensorNums) == -1){
                 };
-                $("#sensor_table").append(newSensorRow(value))
+                $("#sensor_table").append(newSensorRow(value));
                 auxSensorNums.push(value[0]);
             });
             sensorNums = auxSensorNums;
           }
+        });
+      }
+
+      function triggerSet(){
+        var r = $("#id_triggerXYZ").val();
+        $("[name='triggerX']").each(function(i, e){
+          e.value = r;
+        });
+        $("[name='triggerY']").each(function(i, e){
+          e.value = r;
+        });
+        $("[name='triggerZ']").each(function(i, e){
+          e.value = r;
         });
       }
 
@@ -142,9 +155,6 @@
         }
       }
 
-      function secondTrigger(){
-        $("[name='secondTriggerThresh']")[0].disabled = !$("[name='enableSecondTrigger']")[0].checked;
-      }
   </script>
   <style type="text/css">
 
@@ -210,17 +220,17 @@
                 <td class="col-xs-1">
                 <td class="col-xs-1">
                 <td class="col-xs-3">
-                  <input type="number" name="triggerXYZ" min=0.01 step=0.001 value=0.01>
-                  <input type="button" name="setTrigger" value="Set" onclick=secondTrigger()>
+                  <input type="number" id="id_triggerXYZ" name="triggerXYZ" min=0.01 step=0.001 value=0.01>
+                  <input type="button" id="id_setTrigger" name="setTrigger" value="Set" onclick="triggerSet()">
                 <td class="col-xs-3">
-                  <input type="number" name="detriggerXYZ" min=0.01 step=0.001 value=0.01>
-                  <input type="button" name="setDetrigger" value="Set" onclick=secondTrigger()>
+                  <input type="number" id="id_detriggerXYZ" name="detriggerXYZ" min=0.01 step=0.001 value=0.01>
+                  <input type="button" id="id_setDetrigger" name="setDetrigger" value="Set" onclick=secondTrigger()>
                 <td class="col-xs-2">
-                  <input type="number" name="votesXYZ" min=0 value=1>
-                  <input type="button" name="setVotes" value="Set" onclick=secondTrigger()>
+                  <input type="number" id="id_votesXYZ" name="votesXYZ" min=0 value=1>
+                  <input type="button" id="id_setVotes" name="setVotes" value="Set" onclick=secondTrigger()>
                 <td class="col-xs-1">
-                    <input type="number" name="secondTriggerXYZ" min=0.01 step=0.001 value={{secondTriggerThresh}}>
-                    <input type="button" name="setSecondTrigger" value="Set" onclick=secondTrigger()>
+                    <input type="number" id="id_secondTriggerXYZ" name="secondTriggerXYZ" min=0.01 step=0.001 value={{secondTriggerThresh}}>
+                    <input type="button" id="id_setSecondTrigger" name="setSecondTrigger" value="Set" onclick=secondTrigger()>
               </tr>
             {% for sensor in sensors %}
               <script>
