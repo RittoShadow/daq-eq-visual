@@ -7,7 +7,7 @@
 {% block meta %}
 <meta charset="utf-8">
 <script type="text/javascript">
-  var ip = {{ ip }};
+  // var ip = {{ ip }};
 </script>
 <link rel="stylesheet" href="{% static "plot/css/bootstrap.min.css" %}">
 <script src="{% static "plot/js/jquery-1.12.4.min.js" %}"></script>
@@ -41,6 +41,7 @@
   Servicio de Graficación DAQ-EQ ^mini
   {% endblock %}
   {% block content %}
+<input type="hidden" id="websocket-ip" value="{{ ip }}">
 <div class="container col-md-12">
   <div class="container flow-buttons col-md-10">
     <button type="button" class="btn btn-default pausar-vistas">
