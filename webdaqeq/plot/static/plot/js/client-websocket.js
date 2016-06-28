@@ -38,7 +38,7 @@ if (!Math.ceil10) {
 
 $(function () {
     //change example.com with your IP or your host
-  var ws = new WebSocket("ws://localhost:7000/ws");
+  var ws = new WebSocket("ws://" + $("#websocket-ip").val() + ":7000/ws");
   ws.onopen = function(evt) {
     var conn_status = $('#conn_text');
     conn_status.removeClass('label-danger');
