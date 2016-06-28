@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout
 
 import matplotlib
+import subprocess
 matplotlib.use('Agg')
 import netifaces as net
 import plot
@@ -91,8 +92,16 @@ def start_stop_signal(request):
 	# Obtener PID del proceso de app en c++ de daq-eq
 	pid = os.popen("pgrep 'RBA-DAQ-EQ'").read()
 	if (pid) :
-	    # Enviar signal SIG_USR1 a app en c++, para iniciar/detener adquirir datos
-		os.kill(int(pid), signal.SIGUSR1) # Unix version only...
+		if "command" in request.POST:
+			if request.POST["command"] == "stop":
+			    # Enviar signal SIG_USR1 a app en c++, para iniciar/detener adquirir datos
+				os.kill(int(pid), signal.SIGUSR1) # Unix version only...
+			elif request.POST["command"] == "start":
+				command_server("0")
+			elif request.POST["command"] == "trigger":
+				os.kill(int(pid), signal.SIGALRM)
+		else:
+			os.kill(int(pid), signal.SIGUSR1)
 	if request.POST["this_url"]:
 		return redirect(request.POST["this_url"])
 
@@ -102,8 +111,11 @@ def ask_daqeq_status():
 	# Obtener PID del proceso de app en c++ de daq-eq
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
-	result = int(os.popen("sudo python ask_daqeq_status.py").read().strip())
-	print "Result is: "+str(result)
+	result = 0
+	try:
+		result = int(subprocess.Popen(["sudo","python","ask_daqeq_status.py"], stdout=subprocess.PIPE).stdout.read().strip())
+	except ValueError:
+		result = -1
 	if result == 0:
 		return "Reiniciar"
 	elif result == 1:
@@ -145,6 +157,12 @@ def configVerification(request):
 				command_server("erst")
 			else:
 				command_server("ersf")
+			if "enableSecondTrigger" in request.POST:
+				command_server("enst")
+				# if request.POST["secondTriggerThresh"]:
+				# 	command_server("nts",request.POST["secondTriggerThresh"])
+			else:
+				command_server("ensf")
 			if request.POST["graphWindow"]:
 				command_server("ngs",request.POST["graphWindow"])
 			if request.POST["filterWindow"]:
@@ -203,7 +221,13 @@ def configVerification(request):
 						sensorParams = sensorParams + "1;"
 					else:
 						sensorParams = sensorParams + "0;"
-					if len(sensorParams.split(";"))==15:
+					if request.POST.getlist("secondTriggerX")[i]:
+						sensorParams = sensorParams + request.POST.getlist("secondTriggerX")[i].strip(";") + ";"
+					if request.POST.getlist("secondTriggerY")[i]:
+						sensorParams = sensorParams + request.POST.getlist("secondTriggerY")[i].strip(";") + ";"
+					if request.POST.getlist("secondTriggerZ")[i]:
+						sensorParams = sensorParams + request.POST.getlist("secondTriggerZ")[i].strip(";") + ";"
+					if len(sensorParams.split(";"))==18:
 						print "Sending..."
 						listSensorParams.append(sensorParams)
 			command_server("cas",listSensorParams)
@@ -288,7 +312,13 @@ class ConfigurationFormView(FormView):
 		context["page_title"] = "Configuración"
 		context["this_url"] = "/plot/config/"
 		context["action_text"] = ask_daqeq_status()
+		command_server("elg")
 		context["sensors"] = command_server("cag")
+		context["secondTriggerThresh"] = 1
+		if command_server("eng") == "1":
+			context["secondTrigger"] = True
+		else:
+			context["secondTrigger"] = False
 		return context
 
 
