@@ -113,7 +113,8 @@ def ask_daqeq_status():
 	os.chdir(route)
 	result = 0
 	try:
-		result = int(subprocess.Popen(["sudo","python","ask_daqeq_status.py"], stdout=subprocess.PIPE).stdout.read().strip())
+		#result = int(subprocess.Popen(["sudo","python","ask_daqeq_status.py"], stdout=subprocess.PIPE).stdout.read().strip())
+		result = int(os.popen("sudo python ask_daqeq_status.py").read().strip())
 	except ValueError:
 		result = -1
 	if result == 0:
@@ -125,7 +126,8 @@ def ask_daqeq_status():
 
 @login_required(login_url="/plot/login/")
 def view(request):
-	return render(request, 'plot/views.html', {})
+	ip = net.ifaddresses('eth0')[2][0]['addr']
+	return render(request, 'plot/views.html', { "this_url" : "/plot/views/", "ip" : ip})
 
 @login_required(login_url="/plot/login/")
 def sensor(request):
@@ -188,49 +190,49 @@ def configVerification(request):
 			if request.POST["outputDir"]:
 				command_server("sos",request.POST["outputDir"])
 			listSensorParams = []
-			if request.POST.getlist("serialNum"):
-				for i in range(len(request.POST.getlist("serialNum"))):
-					sensorParams = request.POST.getlist("serialNum")[i] + ";"
-					if request.POST.getlist("position")[i]:
-						sensorParams = sensorParams + request.POST.getlist("position")[i].strip(";") + ";"
-					if request.POST.getlist("triggerX")[i]:
-						sensorParams = sensorParams + request.POST.getlist("triggerX")[i].strip(";") + ";"
-					if request.POST.getlist("triggerY")[i]:
-						sensorParams = sensorParams + request.POST.getlist("triggerY")[i].strip(";") + ";"
-					if request.POST.getlist("triggerZ")[i]:
-						sensorParams = sensorParams + request.POST.getlist("triggerZ")[i].strip(";") + ";"
-					if request.POST.getlist("detriggerX")[i]:
-						sensorParams = sensorParams + request.POST.getlist("detriggerX")[i].strip(";") + ";"
-					if request.POST.getlist("detriggerY")[i]:
-						sensorParams = sensorParams + request.POST.getlist("detriggerY")[i].strip(";") + ";"
-					if request.POST.getlist("detriggerZ")[i]:
-						sensorParams = sensorParams + request.POST.getlist("detriggerZ")[i].strip(";") + ";"
-					if request.POST.getlist("detrend")[i]:
-						sensorParams = sensorParams + request.POST.getlist("detrend")[i].strip(";") + ";"
-					if request.POST.getlist("votesX")[i]:
-						sensorParams = sensorParams + request.POST.getlist("votesX")[i].strip(";") + ";"
-					if request.POST.getlist("votesY")[i]:
-						sensorParams = sensorParams + request.POST.getlist("votesY")[i].strip(";") + ";"
-					if request.POST.getlist("votesZ")[i]:
-						sensorParams = sensorParams + request.POST.getlist("votesZ")[i].strip(";") + ";"
-					if "check"+request.POST.getlist("serialNum")[i] in request.POST:
-						sensorParams = sensorParams + "1;"
-					else:
-						sensorParams = sensorParams + "0;"
-					if request.POST["isRed"+request.POST.getlist("serialNum")[i]] == "true":
-						sensorParams = sensorParams + "1;"
-					else:
-						sensorParams = sensorParams + "0;"
-					if request.POST.getlist("secondTriggerX")[i]:
-						sensorParams = sensorParams + request.POST.getlist("secondTriggerX")[i].strip(";") + ";"
-					if request.POST.getlist("secondTriggerY")[i]:
-						sensorParams = sensorParams + request.POST.getlist("secondTriggerY")[i].strip(";") + ";"
-					if request.POST.getlist("secondTriggerZ")[i]:
-						sensorParams = sensorParams + request.POST.getlist("secondTriggerZ")[i].strip(";") + ";"
-					if len(sensorParams.split(";"))==18:
-						print "Sending..."
-						listSensorParams.append(sensorParams)
-			command_server("cas",listSensorParams)
+			# if request.POST.getlist("serialNum"):
+			# 	for i in range(len(request.POST.getlist("serialNum"))):
+			# 		sensorParams = request.POST.getlist("serialNum")[i] + ";"
+			# 		if request.POST.getlist("position")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("position")[i].strip(";") + ";"
+			# 		if request.POST.getlist("triggerX")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("triggerX")[i].strip(";") + ";"
+			# 		if request.POST.getlist("triggerY")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("triggerY")[i].strip(";") + ";"
+			# 		if request.POST.getlist("triggerZ")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("triggerZ")[i].strip(";") + ";"
+			# 		if request.POST.getlist("detriggerX")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("detriggerX")[i].strip(";") + ";"
+			# 		if request.POST.getlist("detriggerY")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("detriggerY")[i].strip(";") + ";"
+			# 		if request.POST.getlist("detriggerZ")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("detriggerZ")[i].strip(";") + ";"
+			# 		if request.POST.getlist("detrend")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("detrend")[i].strip(";") + ";"
+			# 		if request.POST.getlist("votesX")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("votesX")[i].strip(";") + ";"
+			# 		if request.POST.getlist("votesY")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("votesY")[i].strip(";") + ";"
+			# 		if request.POST.getlist("votesZ")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("votesZ")[i].strip(";") + ";"
+			# 		if "check"+request.POST.getlist("serialNum")[i] in request.POST:
+			# 			sensorParams = sensorParams + "1;"
+			# 		else:
+			# 			sensorParams = sensorParams + "0;"
+			# 		if request.POST["isRed"+request.POST.getlist("serialNum")[i]] == "true":
+			# 			sensorParams = sensorParams + "1;"
+			# 		else:
+			# 			sensorParams = sensorParams + "0;"
+			# 		if request.POST.getlist("secondTriggerX")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("secondTriggerX")[i].strip(";") + ";"
+			# 		if request.POST.getlist("secondTriggerY")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("secondTriggerY")[i].strip(";") + ";"
+			# 		if request.POST.getlist("secondTriggerZ")[i]:
+			# 			sensorParams = sensorParams + request.POST.getlist("secondTriggerZ")[i].strip(";") + ";"
+			# 		if len(sensorParams.split(";"))==18:
+			# 			print "Sending..."
+			# 			listSensorParams.append(sensorParams)
+			# command_server("cas",listSensorParams)
 			command_server("0")
 		elif request.POST["this_url"] == "/plot/notification/":
 			if request.POST["sendFrequency"]:
@@ -312,9 +314,8 @@ class ConfigurationFormView(FormView):
 		context["page_title"] = "Configuración"
 		context["this_url"] = "/plot/config/"
 		context["action_text"] = ask_daqeq_status()
-		command_server("elg")
-		context["sensors"] = command_server("cag")
-		context["secondTriggerThresh"] = 1
+		#command_server("elg")
+		#context["sensors"] = command_server("cag")
 		if command_server("eng") == "1":
 			context["secondTrigger"] = True
 		else:
