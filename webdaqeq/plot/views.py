@@ -111,9 +111,11 @@ def ask_daqeq_status():
 	# Obtener PID del proceso de app en c++ de daq-eq
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
-	#t = subprocess.Popen(["sudo","python","ask_daqeq_status.py"],stdout=PIPE)
-	result = int(os.popen("sudo python ask_daqeq_status.py").read().strip())
-	print "Result is: "+str(result)
+	result = 0
+	try:
+		result = int(subprocess.Popen(["sudo","python","ask_daqeq_status.py"], stdout=subprocess.PIPE).stdout.read().strip())
+	except TypeError:
+		result = -1
 	if result == 0:
 		return "Reiniciar"
 	elif result == 1:
@@ -155,7 +157,7 @@ def configVerification(request):
 				command_server("erst")
 			else:
 				command_server("ersf")
-			if request.POST["enableSecondTrigger"]:
+			if "enableSecondTrigger" in request.POST:
 				command_server("enst")
 			else:
 				command_server("ensf")
@@ -184,7 +186,8 @@ def configVerification(request):
 			if request.POST["outputDir"]:
 				command_server("sos",request.POST["outputDir"])
 			if request.POST["secondTriggerThresh"]:
-				command_server("nts",request.POST["secondTriggerThresh"])			
+				print "Second trigger threshold is: "+request.POST["secondTriggerThresh"]
+				command_server("nts",request.POST["secondTriggerThresh"])
 			listSensorParams = []
 			if request.POST.getlist("serialNum"):
 				for i in range(len(request.POST.getlist("serialNum"))):
@@ -304,7 +307,9 @@ class ConfigurationFormView(FormView):
 		context["page_title"] = "Configuración"
 		context["this_url"] = "/plot/config/"
 		context["action_text"] = ask_daqeq_status()
+		command_server("elg")
 		context["sensors"] = command_server("cag")
+		print "I receive: "+command_server("ntg")
 		context["secondTriggerThresh"] = command_server("ntg")
 		if command_server("eng") == "1":
 			context["secondTrigger"] = True
