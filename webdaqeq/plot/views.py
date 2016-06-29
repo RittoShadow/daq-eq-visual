@@ -161,12 +161,12 @@ def configVerification(request):
 				command_server("erst")
 			else:
 				command_server("ersf")
-			if "enableSecondTrigger" in request.POST:
-				command_server("enst")
-				# if request.POST["secondTriggerThresh"]:
-				# 	command_server("nts",request.POST["secondTriggerThresh"])
-			else:
-				command_server("ensf")
+			# if "enableSecondTrigger" in request.POST:
+			# 	command_server("enst")
+			# 	# if request.POST["secondTriggerThresh"]:
+			# 	# 	command_server("nts",request.POST["secondTriggerThresh"])
+			# else:
+			# 	command_server("ensf")
 			if request.POST["graphWindow"]:
 				command_server("ngs",request.POST["graphWindow"])
 			if request.POST["filterWindow"]:
@@ -225,13 +225,13 @@ def configVerification(request):
 						sensorParams = sensorParams + "1;"
 					else:
 						sensorParams = sensorParams + "0;"
-					if request.POST.getlist("secondTriggerX")[i]:
-						sensorParams = sensorParams + request.POST.getlist("secondTriggerX")[i].strip(";") + ";"
-					if request.POST.getlist("secondTriggerY")[i]:
-						sensorParams = sensorParams + request.POST.getlist("secondTriggerY")[i].strip(";") + ";"
-					if request.POST.getlist("secondTriggerZ")[i]:
-						sensorParams = sensorParams + request.POST.getlist("secondTriggerZ")[i].strip(";") + ";"
-					if len(sensorParams.split(";"))==18:
+					# if request.POST.getlist("secondTriggerX")[i]:
+					# 	sensorParams = sensorParams + request.POST.getlist("secondTriggerX")[i].strip(";") + ";"
+					# if request.POST.getlist("secondTriggerY")[i]:
+					# 	sensorParams = sensorParams + request.POST.getlist("secondTriggerY")[i].strip(";") + ";"
+					# if request.POST.getlist("secondTriggerZ")[i]:
+					# 	sensorParams = sensorParams + request.POST.getlist("secondTriggerZ")[i].strip(";") + ";"
+					if len(sensorParams.split(";"))==15:
 						print "Sending..."
 						listSensorParams.append(sensorParams)
 			command_server("cas",listSensorParams)
@@ -318,10 +318,10 @@ class ConfigurationFormView(FormView):
 		context["action_text"] = ask_daqeq_status()
 		#command_server("elg")
 		context["sensors"] = command_server("cag")
-		if command_server("eng") == "1":
-			context["secondTrigger"] = True
-		else:
-			context["secondTrigger"] = False
+		# if command_server("eng") == "1":
+		# 	context["secondTrigger"] = True
+		# else:
+		# 	context["secondTrigger"] = False
 		return context
 
 
