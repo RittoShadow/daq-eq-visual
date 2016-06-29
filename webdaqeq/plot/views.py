@@ -66,7 +66,8 @@ def formatData(request):
 		return render(request, 'plot/index.html',{ "graph" : "Nothing to show"})
 
 def subscribe(request):
-	ip = net.ifaddresses('eth0')[2][0]['addr']
+	# ip = net.ifaddresses('eth0')[2][0]['addr']
+	ip = 'localhost'
 	return render(request, 'plot/plot.html', { "ip" : ip })
 
 def newPlot(request,data):
@@ -126,7 +127,8 @@ def ask_daqeq_status():
 
 @login_required(login_url="/plot/login/")
 def view(request):
-	ip = net.ifaddresses('eth0')[2][0]['addr']
+	# ip = net.ifaddresses('eth0')[2][0]['addr']
+	ip = 'localhost'
 	return render(request, 'plot/views.html', { "this_url" : "/plot/views/", "ip" : ip})
 
 @login_required(login_url="/plot/login/")
