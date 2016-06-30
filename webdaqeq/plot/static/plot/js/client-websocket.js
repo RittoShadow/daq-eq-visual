@@ -9,6 +9,7 @@ var buffers = [];
 var count = 0;
 var sensor_charts = [];
 var chart = null;
+var should_show_plot = true;
 
 /* adjust decimals with floating point in account */
 function decimalAdjust(type, value, exp) {
@@ -35,6 +36,18 @@ if (!Math.ceil10) {
       return decimalAdjust('ceil', value, exp);
     };
   }
+
+function setShowPlot() {
+  console.log(should_show_plot);
+  if (should_show_plot) {
+    $('#pause-btn').css('display', 'none');
+    $('#start-btn').css('display', 'inline-block');
+  } else {
+    $('#pause-btn').css('display', 'inline-block');
+    $('#start-btn').css('display', 'none');
+  }
+  should_show_plot = !should_show_plot;
+}
 
 $(function () {
     //change example.com with your IP or your host
@@ -118,24 +131,42 @@ $(function () {
         first_timestamp = false;
       });
       first_timestamp = false;
-
-      if ($("#main-chart").hasClass("active")) {
-        updateChart();
-      }
-      // updateChart();
-      var i = 0;
-      // updateMainChart(chart, sensors);
-      updateChart();
-      $.each(sensor_charts, function(index, chart) {     
-        var sensor_name = sensors[i];
-        if ($("#" + sensor_name).hasClass("active")) {
-          updateChartPlot(chart['x'], buffers[sensor_name]['x']);
-          updateChartPlot(chart['y'], buffers[sensor_name]['y']);
-          updateChartPlot(chart['z'], buffers[sensor_name]['z']);
+      if (should_show_plot) {
+        if ($("#main-chart").hasClass("active")) {
+          updateChart();
         }
+        // updateChart();
+        var i = 0;
+        // updateMainChart(chart, sensors);
+        // updateChart();
+        $.each(sensor_charts, function(index, chart) {     
+          var sensor_name = sensors[i];
+          if ($("#" + sensor_name).hasClass("active")) {
+            updateChartPlot(chart['x'], buffers[sensor_name]['x']);
+            updateChartPlot(chart['y'], buffers[sensor_name]['y']);
+            updateChartPlot(chart['z'], buffers[sensor_name]['z']);
+          }
+          
+          i = i + 1;
+        });
+      }
+      // if ($("#main-chart").hasClass("active")) {
+      //   updateChart();
+      // }
+      // updateChart();
+      // var i = 0;
+      // // updateMainChart(chart, sensors);
+      // // updateChart();
+      // $.each(sensor_charts, function(index, chart) {     
+      //   var sensor_name = sensors[i];
+      //   if ($("#" + sensor_name).hasClass("active")) {
+      //     updateChartPlot(chart['x'], buffers[sensor_name]['x']);
+      //     updateChartPlot(chart['y'], buffers[sensor_name]['y']);
+      //     updateChartPlot(chart['z'], buffers[sensor_name]['z']);
+      //   }
         
-        i = i + 1;
-      });
+      //   i = i + 1;
+      // });
       
     }
     else if (type == 'status') {
