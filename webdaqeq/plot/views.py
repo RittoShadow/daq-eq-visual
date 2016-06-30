@@ -67,6 +67,7 @@ def formatData(request):
 
 def subscribe(request):
 	ip = net.ifaddresses('eth0')[2][0]['addr']
+	# ip = 'localhost'
 	return render(request, 'plot/plot.html', { "ip" : ip })
 
 def newPlot(request,data):
@@ -127,6 +128,7 @@ def ask_daqeq_status():
 @login_required(login_url="/plot/login/")
 def view(request):
 	ip = net.ifaddresses('eth0')[2][0]['addr']
+	# ip = 'localhost'
 	return render(request, 'plot/views.html', { "this_url" : "/plot/views/", "ip" : ip})
 
 @login_required(login_url="/plot/login/")
@@ -160,6 +162,7 @@ def configVerification(request):
 				command_server("erst")
 			else:
 				command_server("ersf")
+
 			# # if "enableSecondTrigger" in request.POST:
 			# # 	command_server("enst")
 			# # 	# if request.POST["secondTriggerThresh"]:
@@ -228,6 +231,7 @@ def configVerification(request):
 						sensorParams = sensorParams + "1;"
 					else:
 						sensorParams = sensorParams + "0;"
+						
 			# 		# if request.POST.getlist("secondTriggerX")[i]:
 			# 		# 	sensorParams = sensorParams + request.POST.getlist("secondTriggerX")[i].strip(";") + ";"
 			# 		# if request.POST.getlist("secondTriggerY")[i]:
