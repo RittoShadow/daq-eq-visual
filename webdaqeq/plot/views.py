@@ -231,7 +231,7 @@ def configVerification(request):
 						sensorParams = sensorParams + "1;"
 					else:
 						sensorParams = sensorParams + "0;"
-						
+
 			# 		# if request.POST.getlist("secondTriggerX")[i]:
 			# 		# 	sensorParams = sensorParams + request.POST.getlist("secondTriggerX")[i].strip(";") + ";"
 			# 		# if request.POST.getlist("secondTriggerY")[i]:
@@ -291,32 +291,34 @@ class ConfigurationFormView(FormView):
 	def __init__(self, *args, **kwargs):
 		route = settings.BASE_DIR+"/plot"
 		os.chdir(route)
-		if command_server("eag") == "1":
-			self.initial['enableAutoStart'] = 'on'
-		else:
-			self.initial['enableAutoStart'] = None
-		if command_server("etg") == "1":
-			self.initial['enableTrigger'] = 'on'
-		else:
-			self.initial['enableTrigger'] = None
-		if command_server("erg") == "1":
-			self.initial['enableRecording'] = 'on'
-		else:
-			self.initial['enableRecording'] = None
-		self.initial['graphWindow'] = command_server("ngg")
-		self.initial['filterWindow'] = command_server("nfg")
-		self.initial['preEventTime'] = command_server("nag")
-		self.initial['postEventTime'] = command_server("nbg")
-		self.initial['minTimeRunning'] = command_server("nmg")
-		self.initial['votes'] = command_server("nvg")
-		self.initial['recordLength'] = command_server("nrg")
-		self.initial['portNumber'] = command_server("npg")
-		self.initial['filenameFormat'] = command_server("sfg")
-		self.initial['serverURL'] = command_server("sug")
-		self.initial['networkName'] = command_server("sng")
-		self.initial['outputDir'] = command_server("sog")
-		self.initial["username"] = command_server("sig")
-		self.initial["password"] = command_server("spg")
+		if daqeq_is_running() == False:
+			print "is_not_running"
+			if command_server("eag") == "1":
+				self.initial['enableAutoStart'] = 'on'
+			else:
+				self.initial['enableAutoStart'] = None
+			if command_server("etg") == "1":
+				self.initial['enableTrigger'] = 'on'
+			else:
+				self.initial['enableTrigger'] = None
+			if command_server("erg") == "1":
+				self.initial['enableRecording'] = 'on'
+			else:
+				self.initial['enableRecording'] = None
+			self.initial['graphWindow'] = command_server("ngg")
+			self.initial['filterWindow'] = command_server("nfg")
+			self.initial['preEventTime'] = command_server("nag")
+			self.initial['postEventTime'] = command_server("nbg")
+			self.initial['minTimeRunning'] = command_server("nmg")
+			self.initial['votes'] = command_server("nvg")
+			self.initial['recordLength'] = command_server("nrg")
+			self.initial['portNumber'] = command_server("npg")
+			self.initial['filenameFormat'] = command_server("sfg")
+			self.initial['serverURL'] = command_server("sug")
+			self.initial['networkName'] = command_server("sng")
+			self.initial['outputDir'] = command_server("sog")
+			self.initial["username"] = command_server("sig")
+			self.initial["password"] = command_server("spg")
 		super(ConfigurationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
@@ -324,7 +326,7 @@ class ConfigurationFormView(FormView):
 		context["page_title"] = "Configuración"
 		context["this_url"] = "/plot/config/"
 		context["action_text"] = ask_daqeq_status()
-		#command_server("elg")
+		command_server("elg")
 		context["sensors"] = command_server("cag")
 		# if command_server("eng") == "1":
 		# 	context["secondTrigger"] = True
@@ -340,32 +342,34 @@ class NotificationFormView(FormView):
 	def __init__(self, *args, **kwargs):
 		route = settings.BASE_DIR+"/plot"
 		os.chdir(route)
-		if command_server("emg") == "1":
-			self.initial['sendSMS'] = 'on'
-		else:
-			self.initial['sendSMS'] = None
-		if command_server("esg") == "1":
-			self.initial['sendRecord'] = 'on'
-		else:
-			self.initial['sendRecord'] = None
-		if command_server("ecg") == "1":
-			self.initial['compressRecord'] = 'on'
-		else:
-			self.initial['compressRecord'] = None
-		if command_server("ehg") == "1":
-			self.initial['sendStructHealth'] = 'on'
-		else:
-			self.initial['sendStructHealth'] = None
-		self.initial["sendFrequency"] = command_server("nsg")
-		self.initial["verificationFrequency"] = command_server("nog")
-		self.initial["username"] = command_server("sig")
-		self.initial["password"] = command_server("spg")
-		self.initial["structure"] = command_server("ssg")
-		self.initial["email"] = command_server("seg")
-		self.initial["phoneNumber"] = command_server("stg")
-		self.initial["authenticationURL"] = command_server("sag")
-		self.initial["recordURL"] = command_server("srg")
-		self.initial["structHealthURL"] = command_server("shg")
+		if daqeq_is_running() == False:
+			print "is_not_running!"
+			if command_server("emg") == "1":
+				self.initial['sendSMS'] = 'on'
+			else:
+				self.initial['sendSMS'] = None
+			if command_server("esg") == "1":
+				self.initial['sendRecord'] = 'on'
+			else:
+				self.initial['sendRecord'] = None
+			if command_server("ecg") == "1":
+				self.initial['compressRecord'] = 'on'
+			else:
+				self.initial['compressRecord'] = None
+			if command_server("ehg") == "1":
+				self.initial['sendStructHealth'] = 'on'
+			else:
+				self.initial['sendStructHealth'] = None
+			self.initial["sendFrequency"] = command_server("nsg")
+			self.initial["verificationFrequency"] = command_server("nog")
+			self.initial["username"] = command_server("sig")
+			self.initial["password"] = command_server("spg")
+			self.initial["structure"] = command_server("ssg")
+			self.initial["email"] = command_server("seg")
+			self.initial["phoneNumber"] = command_server("stg")
+			self.initial["authenticationURL"] = command_server("sag")
+			self.initial["recordURL"] = command_server("srg")
+			self.initial["structHealthURL"] = command_server("shg")
 		super(NotificationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
