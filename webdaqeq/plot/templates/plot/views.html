@@ -44,8 +44,11 @@
 <input type="hidden" id="websocket-ip" value="{{ ip }}">
 <div class="container col-md-12">
   <div class="container flow-buttons col-md-10">
-    <button type="button" class="btn btn-default pausar-vistas">
+    <button type="button" class="btn btn-default pausar-vistas" id="pause-btn" onclick="setShowPlot();">
       <span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pausar Vistas
+    </button>
+    <button type="button" class="btn btn-success" id="start-btn" style="display: none" onclick="setShowPlot();">
+      <span class="glyphicon glyphicon-play" aria-hidden="true"></span>Reiniciar vistas
     </button>
     <button type="button" class="btn btn-default iniciar-app" onclick="sendSignal('start')">
       <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Iniciar Aplicación
