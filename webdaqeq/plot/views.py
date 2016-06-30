@@ -146,6 +146,7 @@ def configVerification(request):
 	os.chdir(route)
 	if request.method == "POST":
 		if request.POST["this_url"] == "/plot/config/":
+			print "It's working?"
 			sensorParams = ""
 			if "enableAutoStart" in request.POST:
 				command_server("east")
@@ -159,12 +160,12 @@ def configVerification(request):
 				command_server("erst")
 			else:
 				command_server("ersf")
-			if "enableSecondTrigger" in request.POST:
-				command_server("enst")
-				# if request.POST["secondTriggerThresh"]:
-				# 	command_server("nts",request.POST["secondTriggerThresh"])
-			else:
-				command_server("ensf")
+			# # if "enableSecondTrigger" in request.POST:
+			# # 	command_server("enst")
+			# # 	# if request.POST["secondTriggerThresh"]:
+			# # 	# 	command_server("nts",request.POST["secondTriggerThresh"])
+			# # else:
+			# # 	command_server("ensf")
 			if request.POST["graphWindow"]:
 				command_server("ngs",request.POST["graphWindow"])
 			if request.POST["filterWindow"]:
@@ -189,6 +190,10 @@ def configVerification(request):
 				command_server("sns",request.POST["networkName"])
 			if request.POST["outputDir"]:
 				command_server("sos",request.POST["outputDir"])
+			if request.POST["username"]:
+				command_server("sis",request.POST["username"])
+			if request.POST["password"]:
+				command_server("sps",request.POST["password"])
 			listSensorParams = []
 			if request.POST.getlist("serialNum"):
 				for i in range(len(request.POST.getlist("serialNum"))):
@@ -223,14 +228,13 @@ def configVerification(request):
 						sensorParams = sensorParams + "1;"
 					else:
 						sensorParams = sensorParams + "0;"
-					if request.POST.getlist("secondTriggerX")[i]:
-						sensorParams = sensorParams + request.POST.getlist("secondTriggerX")[i].strip(";") + ";"
-					if request.POST.getlist("secondTriggerY")[i]:
-						sensorParams = sensorParams + request.POST.getlist("secondTriggerY")[i].strip(";") + ";"
-					if request.POST.getlist("secondTriggerZ")[i]:
-						sensorParams = sensorParams + request.POST.getlist("secondTriggerZ")[i].strip(";") + ";"
-					if len(sensorParams.split(";"))==18:
-						print "Sending..."
+			# 		# if request.POST.getlist("secondTriggerX")[i]:
+			# 		# 	sensorParams = sensorParams + request.POST.getlist("secondTriggerX")[i].strip(";") + ";"
+			# 		# if request.POST.getlist("secondTriggerY")[i]:
+			# 		# 	sensorParams = sensorParams + request.POST.getlist("secondTriggerY")[i].strip(";") + ";"
+			# 		# if request.POST.getlist("secondTriggerZ")[i]:
+			# 		# 	sensorParams = sensorParams + request.POST.getlist("secondTriggerZ")[i].strip(";") + ";"
+					if len(sensorParams.split(";"))==15:
 						listSensorParams.append(sensorParams)
 			command_server("cas",listSensorParams)
 			command_server("0")
@@ -307,6 +311,8 @@ class ConfigurationFormView(FormView):
 		self.initial['serverURL'] = command_server("sug")
 		self.initial['networkName'] = command_server("sng")
 		self.initial['outputDir'] = command_server("sog")
+		self.initial["username"] = command_server("sig")
+		self.initial["password"] = command_server("spg")
 		super(ConfigurationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
@@ -316,10 +322,10 @@ class ConfigurationFormView(FormView):
 		context["action_text"] = ask_daqeq_status()
 		#command_server("elg")
 		context["sensors"] = command_server("cag")
-		if command_server("eng") == "1":
-			context["secondTrigger"] = True
-		else:
-			context["secondTrigger"] = False
+		# if command_server("eng") == "1":
+		# 	context["secondTrigger"] = True
+		# else:
+		# 	context["secondTrigger"] = False
 		return context
 
 

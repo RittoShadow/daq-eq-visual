@@ -99,22 +99,22 @@
         });
       }
 
-      function secondTriggerSet(){
-        var r = $("#id_secondTriggerXYZ").val();
-        $("[name='secondTriggerX']").each(function(i, e){
-          e.value = r;
-        });
-        $("[name='secondTriggerY']").each(function(i, e){
-          e.value = r;
-        });
-        $("[name='secondTriggerZ']").each(function(i, e){
-          e.value = r;
-        });
-      }
+      // function secondTriggerSet(){
+      //   var r = $("#id_secondTriggerXYZ").val();
+      //   $("[name='secondTriggerX']").each(function(i, e){
+      //     e.value = r;
+      //   });
+      //   $("[name='secondTriggerY']").each(function(i, e){
+      //     e.value = r;
+      //   });
+      //   $("[name='secondTriggerZ']").each(function(i, e){
+      //     e.value = r;
+      //   });
+      // }
 
       function newSensorRow(value){
-        if (value[15] == "1"){
-          if (value[16] == "0"){
+        if (value[12] == "1"){
+          if (value[13] == "0"){
             return '<tr>' +
               '<input type="hidden" name="isRed'+value[0]+' "value="false">' +
               '<td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" checked="checked" name="check' + value[0] + '"><input type="text" name="serialNum" readonly="true" value="' + value[0] + '">' +
@@ -132,10 +132,10 @@
                 '<input type="number" name="votesX" min=0 value=' + value[9] + '>' +
                 '<input type="number" name="votesY" min=0 value=' + value[10] + '>' +
                 '<input type="number" name="votesZ" min=0 value=' + value[11] + '>' +
-              '<td class="col-xs-1">' +
-                  '<input type="number" name="secondTriggerX" min=0.01 step=0.001 value=' + value[12] + '>' +
-                  '<input type="number" name="secondTriggerY" min=0.01 step=0.001 value=' + value[13] + '>' +
-                  '<input type="number" name="secondTriggerZ" min=0.01 step=0.001 value=' + value[14] + '>' +
+              // '<td class="col-xs-1">' +
+              //     '<input type="number" name="secondTriggerX" min=0.01 step=0.001 value=' + value[12] + '>' +
+              //     '<input type="number" name="secondTriggerY" min=0.01 step=0.001 value=' + value[13] + '>' +
+              //     '<input type="number" name="secondTriggerZ" min=0.01 step=0.001 value=' + value[14] + '>' +
             '</tr>';
           }
           else{
@@ -156,15 +156,15 @@
                 '<input type="number" name="votesX" min=0 value=' + value[9] + '>' +
                 '<input type="number" name="votesY" min=0 value=' + value[10] + '>' +
                 '<input type="number" name="votesZ" min=0 value=' + value[11] + '>' +
-              '<td class="col-xs-1">' +
-                  '<input type="number" name="secondTriggerX" min=0.01 step=0.001 value=' + value[12] + '>' +
-                  '<input type="number" name="secondTriggerY" min=0.01 step=0.001 value=' + value[13] + '>' +
-                  '<input type="number" name="secondTriggerZ" min=0.01 step=0.001 value=' + value[14] + '>' +
+              // '<td class="col-xs-1">' +
+              //     '<input type="number" name="secondTriggerX" min=0.01 step=0.001 value=' + value[12] + '>' +
+              //     '<input type="number" name="secondTriggerY" min=0.01 step=0.001 value=' + value[13] + '>' +
+              //     '<input type="number" name="secondTriggerZ" min=0.01 step=0.001 value=' + value[14] + '>' +
             '</tr>';
           }
         }
         else{
-          if (value[15] == "0"){
+          if (value[12] == "0"){
             return '<tr>' +
             '<input type="hidden" name="isRed'+value[0]+' "value="false">' +
             '<td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" name="check' + value[0] + '"><input type="text" name="serialNum" readonly="true" value="' + value[0] + '">' +
@@ -182,10 +182,10 @@
               '<input type="number" name="votesX" min=0 value=' + value[9] + '>' +
               '<input type="number" name="votesY" min=0 value=' + value[10] + '>' +
               '<input type="number" name="votesZ" min=0 value=' + value[11] + '>' +
-            '<td class="col-xs-1">' +
-              '<input type="number" name="secondTriggerX" min=0.01 step=0.001 value=' + value[12] + '>' +
-              '<input type="number" name="secondTriggerY" min=0.01 step=0.001 value=' + value[13] + '>' +
-              '<input type="number" name="secondTriggerZ" min=0.01 step=0.001 value=' + value[14] + '>' +
+            // '<td class="col-xs-1">' +
+            //   '<input type="number" name="secondTriggerX" min=0.01 step=0.001 value=' + value[12] + '>' +
+            //   '<input type="number" name="secondTriggerY" min=0.01 step=0.001 value=' + value[13] + '>' +
+            //   '<input type="number" name="secondTriggerZ" min=0.01 step=0.001 value=' + value[14] + '>' +
           '</tr>';
           }
           else{
@@ -292,10 +292,10 @@
                   <input type="number" name="votesX" min=0 value={{sensor.9}}>
                   <input type="number" name="votesY" min=0 value={{sensor.10}}>
                   <input type="number" name="votesZ" min=0 value={{sensor.11}}>
-                <td class="col-xs-1">
+                <!-- <td class="col-xs-1">
                   <input type="number" name="secondTriggerX" min=0.01 step=0.001 value={{sensor.12}}>
                   <input type="number" name="secondTriggerY" min=0.01 step=0.001 value={{sensor.13}}>
-                  <input type="number" name="secondTriggerZ" min=0.01 step=0.001 value={{sensor.14}}>
+                  <input type="number" name="secondTriggerZ" min=0.01 step=0.001 value={{sensor.14}}> -->
               </tr>
 
             {% endfor %}

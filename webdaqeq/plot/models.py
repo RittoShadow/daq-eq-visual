@@ -18,7 +18,7 @@ class Configuration(models.Model):
     recordLength = models.IntegerField(default=900, validators=MinValueValidator(100))
     filenameFormat = models.CharField(default="E-TEST-yyyyMMdd_hhmmss",max_length=50)
     enableTrigger = models.BooleanField(default=False)
-    serverURL = models.URLField(default="http://www.shmrba.com")
+    serverURL = models.CharField(default="http://www.shmrba.com", max_length=50)
     portNumber = models.IntegerField(default=7624,validators=MinValueValidator(0))
     networkName = models.CharField(default="Red0",max_length=50)
     enableAutoStart = models.BooleanField(default=False)
