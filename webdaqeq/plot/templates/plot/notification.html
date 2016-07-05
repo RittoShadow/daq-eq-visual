@@ -123,7 +123,7 @@
                 '<input type="checkbox" checked="checked" name="check' + value[0] + '">' +
                 '<input type="text" name="serialNum" readonly="true" value="' + value[0] + '">' +
               '<td class="col-xs-1">' +
-                '<input type="text" name="position" value="' + value[1] + '">' +
+                '<input type="text" name="position" required value="' + value[1] + '">' +
               '<td class="col-xs-1">' +
                 '<input type="number" min=0 name="detrend" value=' + value[8] + '>' +
               '<td class="col-xs-3">' +
@@ -151,7 +151,7 @@
                 '<label class="checkbox-inline">' +
                 '<input type="checkbox" checked="checked" name="check' + value[0] + '">' +
                 '<input type="text" class="text-danger" name="serialNum" readonly="true" value="' + value[0] + '">' +
-              '<td class="col-xs-1"><input type="text" class="text-danger" name="position" value="' + value[1] + '">' +
+              '<td class="col-xs-1"><input type="text" class="text-danger" name="position" required value="' + value[1] + '">' +
               '<td class="col-xs-1"><input type="number" min=0 name="detrend" value=' + value[8] + '>' +
               '<td class="col-xs-3">' +
                 '<input type="number" class="trigger-input" name="triggerX" min=0.01 step=0.001 value=' + value[2] + '>' +
@@ -179,7 +179,7 @@
             '<td class="col-xs-1"><label class="checkbox-inline">' +
               '<input type="checkbox" name="check' + value[0] + '">' +
               '<input type="text" name="serialNum" readonly="true" value="' + value[0] + '">' +
-            '<td class="col-xs-1"><input type="text" name="position" value="' + value[1] + '">' +
+            '<td class="col-xs-1"><input type="text" name="position" required value="' + value[1] + '">' +
             '<td class="col-xs-1"><input type="number" min=0 name="detrend" value=' + value[8] + '>' +
             '<td class="col-xs-3">' +
               '<input type="number" class="trigger-input" name="triggerX" min=0.01 step=0.001 value=' + value[2] + '>' +
@@ -286,7 +286,7 @@
               <tr>
                 <input type="hidden" name="isRed{{sensor.0}}" value={% if sensor.16 == "1" %}"true"{% else %}"false"{% endif %}>
                 <td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" name="check{{sensor.0}}" {% if sensor.15 == "1" %}checked="checked"{% endif %}><input type="text" name="serialNum" {% if sensor.16 == "1" %}class="text-danger"{% endif %} readonly="true" value="{{sensor.0}}">
-                <td class="col-xs-1"><input type="text" {% if sensor.16 == "1" %}class="text-danger"{% endif %} name="position" value="{{sensor.1}}">
+                <td class="col-xs-1"><input type="text" {% if sensor.16 == "1" %}class="text-danger"{% endif %} name="position" required value="{{sensor.1}}">
                 <td class="col-xs-1"><input type="number" min=0 name="detrend" value={{sensor.8}}>
                 <td class="col-xs-3">
                   <input type="number" class="trigger-input" name="triggerX" min=0.01 step=0.001 value={{sensor.2}}>
