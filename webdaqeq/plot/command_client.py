@@ -79,6 +79,7 @@ def command_server(message, params=None):
                     print message + " : received r, sending k"
                     s.sendall("k")
                     print message + " : return reply"
+                    s.close()
                     return reply
                     # break
                 print message + " : appending " + r
