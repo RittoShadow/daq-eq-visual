@@ -31,7 +31,7 @@ class Notification(models.Model):
     username = models.CharField(max_length=20,blank=True)
     password = models.CharField(max_length=20,blank=True)
     structure = models.CharField(max_length=10)
-    email = models.EmailField(max_length=50)
+    email = models.EmailField(max_length=50, blank=True)
     phoneNumber = models.CharField(max_length=15,blank=True)
     sendSMS = models.BooleanField(default=False)
     sendRecord = models.BooleanField(default=False)
