@@ -39,6 +39,8 @@
       }
 
       function refreshSerial(){
+        $("#refreshButton").html('<span class="glyphicon glyphicon-hourglass"></span>');
+        $("#refreshButton").prop("disabled", true);
         $.ajax({
           url: '/plot/sensors/',
           type: "POST",
@@ -82,6 +84,8 @@
                 auxSensorNums.push(value[0]);
             });
             sensorNums = auxSensorNums;
+            $("#refreshButton").html('<span class="glyphicon glyphicon-refresh"></span>');
+            $("#refreshButton").prop("disabled", false);
           }
         });
       }
@@ -286,8 +290,12 @@
               </script>
               <tr>
                 <input type="hidden" name="isRed{{sensor.0}}" value={% if sensor.16 == "1" %}"true"{% else %}"false"{% endif %}>
-                <td class="col-xs-1"><label class="checkbox-inline"><input type="checkbox" name="check{{sensor.0}}" {% if sensor.15 == "1" %}checked="checked"{% endif %}><input type="text" name="serialNum" {% if sensor.16 == "1" %}class="text-danger"{% endif %} readonly="true" value="{{sensor.0}}">
-                <td class="col-xs-1"><input type="text" {% if sensor.16 == "1" %}class="text-danger"{% endif %} name="position" required value="{{sensor.1}}">
+                <td class="col-xs-1">
+                  <label class="checkbox-inline">
+                  <input type="checkbox" name="check{{sensor.0}}" {% if sensor.15 == "1" %}checked="checked"{% endif %}>
+                  <input type="text" name="serialNum" {% if sensor.16 == "1" %}class="text-danger"{% endif %} readonly="true" value="{{sensor.0}}">
+                <td class="col-xs-1">
+                  <input type="text" {% if sensor.16 == "1" %}class="text-danger"{% endif %} name="position" required value="{{sensor.1}}">
                 <td class="col-xs-1"><input type="number" min=0 name="detrend" value={{sensor.8}}>
                 <td class="col-xs-3">
                   <input type="number" class="trigger-input" name="triggerX" min=0.01 step=0.001 value={{sensor.2}}>
@@ -315,13 +323,14 @@
             <h4>Agregar Manualmente</h4>
             <input type="text" name="new_sensor">
             <input type="button" value="Agregar serie" onclick="addSerial()">
-            <span class="icon-input-btn"><span class="glyphicon glyphicon-refresh inline"></span><input type="button" onclick="refreshSerial()"></span>
+            <button type="button" id="refreshButton" class="btn btn-default" onclick="refreshSerial();">
+              <span class="glyphicon glyphicon-refresh"></span>
+            </button>
           </div>
           {% endif %}
         </div>
       </div>
       <input class="btn btn-primary col-md-1" name="action" type="submit" value="{{action_text}}">
-      <input class="btn btn-success col-md-1" name="action" type="button" value="Trigger">
       {% buttons reset="Cancelar" layout='vertical' %}{% endbuttons %}
       <input type="hidden" name="this_url" value="{{this_url}}">
     </form>
@@ -331,7 +340,6 @@
         {% csrf_token %}
         <div class="row">
           <input class="btn btn-primary col-md-1" name="action" type="submit" value="{{action_text}}">
-          <input class="btn btn-success col-md-1" name="action" type="button" value="Trigger">
           {% buttons reset="Cancelar" layout='vertical' %}{% endbuttons %}
           <input type="hidden" name="this_url" value="{{this_url}}">
         </div>
