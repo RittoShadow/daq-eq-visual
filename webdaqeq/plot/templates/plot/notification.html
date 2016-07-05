@@ -38,9 +38,9 @@
         });
       }
 
-      function refreshSerial(){
-        $("#refreshButton").html('<span class="glyphicon glyphicon-hourglass"></span>');
-        $("#refreshButton").prop("disabled", true);
+      function refreshSerial(refreshButton_reference){
+        $(refreshButton_reference).html('<span class="glyphicon glyphicon-hourglass"></span>');
+        $(refreshButton_reference).prop("disabled", true);
         $.ajax({
           url: '/plot/sensors/',
           type: "POST",
@@ -84,8 +84,8 @@
                 auxSensorNums.push(value[0]);
             });
             sensorNums = auxSensorNums;
-            $("#refreshButton").html('<span class="glyphicon glyphicon-refresh"></span>');
-            $("#refreshButton").prop("disabled", false);
+            $(refreshButton_reference).html('<span class="glyphicon glyphicon-refresh"></span>');
+            $(refreshButton_reference).prop("disabled", false);
           }
         });
       }
@@ -326,7 +326,7 @@
             <h4>Agregar Manualmente</h4>
             <input type="text" name="new_sensor">
             <input type="button" value="Agregar serie" onclick="addSerial()">
-            <button type="button" id="refreshButton" class="btn btn-default" onclick="refreshSerial();">
+            <button type="button" class="btn btn-default" onclick="refreshSerial(this);">
               <span class="glyphicon glyphicon-refresh"></span>
             </button>
           </div>
