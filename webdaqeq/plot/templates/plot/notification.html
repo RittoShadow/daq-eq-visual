@@ -184,7 +184,7 @@
             '<td class="col-xs-1"><label class="checkbox-inline">' +
               '<input type="checkbox" name="check' + value[0] + '">' +
               '<input type="text" name="serialNum" readonly="true" value="' + value[0] + '">' +
-            '<td class="col-xs-1"><input type="text" name="position" required value="' + value[1] + '">' +
+            '<td class="col-xs-1"><input type="text" name="position" value="' + value[1] + '">' +
             '<td class="col-xs-1"><input type="number" min=0 name="detrend" value=' + value[8] + '>' +
             '<td class="col-xs-3">' +
               '<input type="number" class="trigger-input" name="triggerX" min=0.01 step=0.001 value=' + value[2] + '>' +
@@ -295,7 +295,7 @@
                   <input type="checkbox" name="check{{sensor.0}}" {% if sensor.15 == "1" %}checked="checked"{% endif %}>
                   <input type="text" name="serialNum" {% if sensor.16 == "1" %}class="text-danger"{% endif %} readonly="true" value="{{sensor.0}}">
                 <td class="col-xs-1">
-                  <input type="text" {% if sensor.16 == "1" %}class="text-danger"{% endif %} name="position" required value="{{sensor.1}}">
+                  <input type="text" {% if sensor.16 == "1" %}class="text-danger"{% endif %} name="position" {% if sensor.15 == "1" %}required{% endif %} value="{{sensor.1}}">
                 <td class="col-xs-1"><input type="number" min=0 name="detrend" value={{sensor.8}}>
                 <td class="col-xs-3">
                   <input type="number" class="trigger-input" name="triggerX" min=0.01 step=0.001 value={{sensor.2}}>
@@ -330,7 +330,9 @@
           {% endif %}
         </div>
       </div>
-      <input class="btn btn-primary col-md-1" name="action" type="submit" value="{{action_text}}">
+      <button type="submit" name="action" class="btn btn-default col-md-1" value="{{action_text}}">
+        <span class="glyphicon glyphicon-floppy-disk submit-span" aria-hidden="true"></span> {{action_text}}
+      </button>
       {% buttons reset="Cancelar" layout='vertical' %}{% endbuttons %}
       <input type="hidden" name="this_url" value="{{this_url}}">
     </form>
@@ -339,7 +341,9 @@
       <form role="form" method="post" action="/plot/signal/">
         {% csrf_token %}
         <div class="row">
-          <input class="btn btn-primary col-md-1" name="action" type="submit" value="{{action_text}}">
+          <button type="submit" name="action" class="btn btn-default col-md-1" value="{{action_text}}" onclick="disable_submit_span()">
+            <span class="glyphicon glyphicon-stop submit-span" aria-hidden="true"></span> {{action_text}}
+          </button>
           {% buttons reset="Cancelar" layout='vertical' %}{% endbuttons %}
           <input type="hidden" name="this_url" value="{{this_url}}">
         </div>
