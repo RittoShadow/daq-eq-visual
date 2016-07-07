@@ -15,17 +15,50 @@
   <div>
     <form action='/plot/result/' method="post" class="form">
     {% csrf_token %}
-    {% if buffer %}
+    {% if files_list %}
     <select name="to_plot">
-      {% for b in buffer %}
+      {% for b in files_list %}
         <option value='{{b}}'>{{b}}</option>
       {% endfor %}
     </select>
-    <input type="submit" value="Plot">
+    <input type="submit" value="Graficar">
     {% endif %}
     </form>
     {% if plot %}
   	<img src='{% url "img" data %}'/>
+    {% endif %}
+    {% if files_list %}
+      <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading"><b>Archivos Locales</b></div>
+        <!-- Table -->
+        <table class="table">
+          <thead>
+            <th><!-- Checkbox --></th>
+            <th>#</th>
+            <th>Archivo</th>
+            <th><!-- DownloadButton --></th>
+            <th><!-- PlotButton --></th>
+          </thead>
+          <tbody>
+            {% for b in files_list %}
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>{{forloop.counter}}</td>
+                <td>{{b}}</td>
+                <td><input type="button" value="Descargar"></td>
+                <td>
+                  <form action='/plot/result/' method="post" class="form">
+                    {% csrf_token %}
+                    <input type="hidden" value='{{b}}' name="to_plot">
+                    <input type="submit" value="Graficar">
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     {% endif %}
   </div>
 </body>

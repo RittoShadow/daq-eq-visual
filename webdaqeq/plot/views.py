@@ -54,7 +54,7 @@ def index(request):
 	files = sorted(map(lambda p : daqeq_home+'trunk/enviados/'+str(p), os.listdir(daqeq_home+'trunk/enviados')), key=os.path.getsize)
 	files = files + map(lambda p: daqeq_home+"trunk/"+str(p), os.listdir(daqeq_home+'trunk/'))
 	files = filter(lambda p : re.search("[\w_-]+TEST[\w_-]+\.txt",p),files)
-	return render(request, "plot/index.html", { "buffer" : files , "page_title" : "Seleccione un archivo:" })
+	return render(request, "plot/index.html", { "files_list" : files , "page_title" : "" })
 # Create your views here.
 
 def formatData(request):
