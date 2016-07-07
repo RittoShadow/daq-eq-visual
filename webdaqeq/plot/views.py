@@ -23,6 +23,8 @@ from command_client import *
 
 daqeq_home = settings.DAQEQ_HOME
 
+from django.views.decorators.csrf import csrf_exempt,csrf_protect
+
 def home(request):
 	return render(request, "plot/home.html", {})
 
@@ -131,6 +133,7 @@ def view(request):
 	# ip = 'localhost'
 	return render(request, 'plot/views.html', { "this_url" : "/plot/views/", "ip" : ip})
 
+@csrf_exempt #This skips csrf validation. Use csrf_protect to have validation
 @login_required(login_url="/plot/login/")
 def sensor(request):
 	if request.POST['command'] == 'refresh':
