@@ -146,6 +146,18 @@ def sensor(request):
 	sensor = command_server("cag")
 	return JsonResponse(sensor, safe=False)
 
+@csrf_exempt #This skips csrf validation. Use csrf_protect to have validation
+@login_required(login_url="/plot/login/")
+def download_one_file(request):
+	from os.path import basename
+	file_path = request.POST['file']
+	response = HttpResponse(file(file_path))
+	response['Content-Type'] = 'application/force-download'
+	response['Content-Length'] = os.path.getsize(file_path)
+	response['Content-Disposition'] = 'attachment; filename=\"' + basename(file_path) + '\"'
+	response['Accept-Ranges'] = 'bytes'
+	return response
+
 @login_required(login_url="/plot/login/")
 def configVerification(request):
 	route = settings.BASE_DIR+"/plot"

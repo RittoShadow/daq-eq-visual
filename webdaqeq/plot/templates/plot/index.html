@@ -37,8 +37,8 @@
             <th><!-- Checkbox --></th>
             <th>#</th>
             <th>Archivo</th>
-            <th><!-- DownloadButton --></th>
             <th><!-- PlotButton --></th>
+            <th><!-- DownloadButton --></th>
           </thead>
           <tbody>
             {% for b in files_list %}
@@ -46,12 +46,18 @@
                 <td><input type="checkbox"></td>
                 <td>{{forloop.counter}}</td>
                 <td>{{b}}</td>
-                <td><input type="button" value="Descargar"></td>
                 <td>
                   <form action='/plot/result/' method="post" class="form">
                     {% csrf_token %}
                     <input type="hidden" value='{{b}}' name="to_plot">
                     <input type="submit" value="Graficar">
+                  </form>
+                </td>
+                <td>
+                  <form action='/download_one_file/' method="post" class="form">
+                    {% csrf_token %}
+                    <input type="hidden" value='{{b}}' name="file">
+                    <input type="submit" value="Descargar">
                   </form>
                 </td>
               </tr>
