@@ -9,6 +9,9 @@ from django.contrib.auth import authenticate, login, logout
 
 import matplotlib
 import subprocess
+import json
+import zipfile
+import StringIO
 matplotlib.use('Agg')
 import netifaces as net
 import plot
@@ -157,6 +160,25 @@ def download_one_file(request):
 	response['Content-Disposition'] = 'attachment; filename=\"' + basename(file_path) + '\"'
 	response['Accept-Ranges'] = 'bytes'
 	return response
+
+@csrf_exempt #This skips csrf validation. Use csrf_protect to have validation
+@login_required(login_url="/plot/login/")
+def download_multi_file(request):
+	filenames = json.loads(request.POST['files_array'])
+	zip_subdir = "daqeq_files-" + (time.strftime("%d-%m-%Y_%H-%M-%S"))
+	zip_filename = "%s.zip" % zip_subdir
+	s = StringIO.StringIO()
+	zf = zipfile.ZipFile(s, "w")
+
+	for fpath in filenames:
+		fdir, fname = os.path.split(fpath)
+		zip_path = os.path.join(zip_subdir, fname)
+		zf.write(fpath, zip_path)
+
+	zf.close()
+	resp = HttpResponse(s.getvalue(), content_type = "application/x-zip-compressed")
+	resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
+	return resp
 
 @login_required(login_url="/plot/login/")
 def configVerification(request):

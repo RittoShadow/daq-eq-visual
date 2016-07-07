@@ -28,6 +28,28 @@
   	<img src='{% url "img" data %}'/>
     {% endif %}
     {% if files_list %}
+      <script>
+        $(function(){
+          $('#multifile-form').submit(function(){
+            var checked_checkboxes = $('[name="selection-checkbox"]:checked');
+            if(checked_checkboxes.length > 0) {
+              var required_files = [];
+              checked_checkboxes.each(function(){
+                required_files.push($(this).attr("value"));
+              });
+              $('#files_array').attr('value', JSON.stringify(required_files));
+              return true;
+            }
+
+            return false;
+          });
+        });
+      </script>
+      <form action='/download_multi_file/' method="post" class="form" id="multifile-form">
+        {% csrf_token %}
+        <input type="hidden" value='' id='files_array' name="files_array">
+        <input type="submit" value="Descargar seleccionados">
+      </form>
       <div class="panel panel-default">
         <!-- Default panel contents -->
         <div class="panel-heading"><b>Archivos Locales</b></div>
@@ -43,7 +65,7 @@
           <tbody>
             {% for b in files_list %}
               <tr>
-                <td><input type="checkbox"></td>
+                <td><input type="checkbox" name="selection-checkbox" value='{{b}}'></td>
                 <td>{{forloop.counter}}</td>
                 <td>{{b}}</td>
                 <td>
