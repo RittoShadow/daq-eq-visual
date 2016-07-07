@@ -25,6 +25,7 @@ daqeq_home = settings.DAQEQ_HOME
 
 from django.views.decorators.csrf import csrf_exempt,csrf_protect
 
+@login_required(login_url="/plot/login/")
 def home(request):
 	return render(request, "plot/home.html", {})
 
