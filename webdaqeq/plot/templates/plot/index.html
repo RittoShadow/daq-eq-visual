@@ -44,6 +44,16 @@
             return false;
           });
         });
+
+        $(function(){
+          $('.localfile-tr').hover(function(){
+            // console.log("in");
+            $(this).css("background-color", "#ffcccc");
+          }, function(){
+            // console.log("out");
+            $(this).css("background-color", "white");
+          });
+        })
       </script>
       <form action='/download_multi_file/' method="post" class="form" id="multifile-form">
         {% csrf_token %}
@@ -64,7 +74,7 @@
           </thead>
           <tbody>
             {% for b in files_list %}
-              <tr>
+              <tr class="localfile-tr">
                 <td><input type="checkbox" name="selection-checkbox" value='{{b}}'></td>
                 <td>{{forloop.counter}}</td>
                 <td>{{b}}</td>
