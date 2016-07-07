@@ -12,7 +12,6 @@ $(function () {
 
 
 
-    // $('#config_form').submit();
     return true;
   });
 
