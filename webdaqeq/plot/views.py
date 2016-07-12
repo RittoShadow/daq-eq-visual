@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Django
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -6,33 +7,41 @@ from django.views.generic import FormView
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.csrf import csrf_exempt,csrf_protect
 
+# Standard
 import matplotlib
+matplotlib.use('Agg')
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 import subprocess
 import json
 import zipfile
 import StringIO
-matplotlib.use('Agg')
 import netifaces as net
 import plot
 import os
+from os.path import basename
 import io
 import re
 import time
 from PIL import Image
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 from models import configForm, notifyForm
 from command_client import *
 
+# Initializations
 daqeq_home = settings.DAQEQ_HOME
-
-from django.views.decorators.csrf import csrf_exempt,csrf_protect
 
 @login_required(login_url="/plot/login/")
 def home(request):
+	"""
+	Vista de home
+	"""
 	return render(request, "plot/home.html", {})
 
 def loginDAQEQ(request):
+	"""
+	Login de app-web
+	"""
 	if request.method == "POST":
 	    username = request.POST['username']
 	    password = request.POST['password']
@@ -49,18 +58,26 @@ def loginDAQEQ(request):
 		return render(request, "registration/login.html", {})
 
 def logoutDAQEQ(request):
+	"""
+	Logout de app-web
+	"""
 	logout(request)
 	return render(request, "plot/home.html", {})
 
 @login_required(login_url="/plot/login/")
 def index(request):
+	"""
+	Datos de archivos .txt de daqeq
+	"""
 	files = sorted(map(lambda p : daqeq_home+'trunk/enviados/'+str(p), os.listdir(daqeq_home+'trunk/enviados')), key=os.path.getsize)
 	files = files + map(lambda p: daqeq_home+"trunk/"+str(p), os.listdir(daqeq_home+'trunk/'))
 	files = filter(lambda p : re.search("[\w_-]+TEST[\w_-]+\.txt",p),files)
 	return render(request, "plot/index.html", { "files_list" : files , "page_title" : "" })
-# Create your views here.
 
 def formatData(request):
+	"""
+	Graficar
+	"""
 	if request.method == "POST":
 		buff = request.POST["to_plot"]
 		if buff:
@@ -95,6 +112,9 @@ def parseConfigFile(request):
 	return {}
 
 def start_stop_signal(request):
+	"""
+	Iniciar o Detener daqeq c++
+	"""
 	import os, signal
 	# Obtener PID del proceso de app en c++ de daq-eq
 	pid = os.popen("pgrep 'RBA-DAQ-EQ'").read()
@@ -113,8 +133,9 @@ def start_stop_signal(request):
 		return redirect(request.POST["this_url"])
 
 def ask_daqeq_status():
-	import os
-
+	"""
+	Preguntar estado de app c++
+	"""
 	# Obtener PID del proceso de app en c++ de daq-eq
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
@@ -140,6 +161,9 @@ def view(request):
 @csrf_exempt #This skips csrf validation. Use csrf_protect to have validation
 @login_required(login_url="/plot/login/")
 def sensor(request):
+	"""
+	Actualizar sensores, o agregar manualmente en vista de config
+	"""
 	if request.POST['command'] == 'refresh':
 		ans = command_server("elg")
 		print "Refresh"
@@ -152,7 +176,9 @@ def sensor(request):
 @csrf_exempt #This skips csrf validation. Use csrf_protect to have validation
 @login_required(login_url="/plot/login/")
 def download_one_file(request):
-	from os.path import basename
+	"""
+	Descargar un archivo
+	"""
 	file_path = request.POST['file']
 	response = HttpResponse(file(file_path))
 	response['Content-Type'] = 'application/force-download'
@@ -164,6 +190,9 @@ def download_one_file(request):
 @csrf_exempt #This skips csrf validation. Use csrf_protect to have validation
 @login_required(login_url="/plot/login/")
 def download_multi_file(request):
+	"""
+	Descargar varios archivos, en un archivo comprimido con fecha en nombre
+	"""
 	filenames = json.loads(request.POST['files_array'])
 	zip_subdir = "daqeq_files-" + (time.strftime("%d-%m-%Y_%H-%M-%S"))
 	zip_filename = "%s.zip" % zip_subdir
@@ -176,12 +205,15 @@ def download_multi_file(request):
 		zf.write(fpath, zip_path)
 
 	zf.close()
-	resp = HttpResponse(s.getvalue(), content_type = "application/x-zip-compressed")
-	resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
-	return resp
+	response = HttpResponse(s.getvalue(), content_type = "application/x-zip-compressed")
+	response['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
+	return response
 
 @login_required(login_url="/plot/login/")
 def configVerification(request):
+	"""
+	Guardar configuraciones hechas en config o notification
+	"""
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
 	if request.method == "POST":
@@ -323,6 +355,9 @@ def configVerification(request):
 	return redirect(request.POST["this_url"])
 
 class ConfigurationFormView(FormView):
+	"""
+	Datos de vista de configuraciones
+	"""
 	template_name = 'plot/notification.html'
 	form_class = configForm
 
@@ -374,6 +409,9 @@ class ConfigurationFormView(FormView):
 
 
 class NotificationFormView(FormView):
+	"""
+	Datos de vista de notificaciones
+	"""
 	template_name = 'plot/notification.html'
 	form_class = notifyForm
 
