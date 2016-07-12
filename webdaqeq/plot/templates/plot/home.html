@@ -5,6 +5,8 @@
 {% load staticfiles %}
 
 {% block bootstrap3_content %}
+<link rel="stylesheet" href="{% static "plot/css/bootstrap.min.css" %}">
+<link rel="stylesheet" href="{% static "plot/css/webdaqeq.css" %}">
 <div class="container col-md-12">
     <nav  class="navbar navbar-default">
         <div class="navbar-header col-md-offset-1">
@@ -26,7 +28,6 @@
             </ul>
         </div>
     </nav>
-    <link rel="stylesheet" href="{% static "plot/css/bootstrap.min.css" %}">
     <script src="{% static "plot/js/jquery-1.12.4.min.js" %}"></script>
     <script src="{% static "plot/js/bootstrap.min.js" %}"></script>
 
