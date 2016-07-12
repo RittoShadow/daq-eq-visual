@@ -12,6 +12,7 @@
 </head>
 {% block content %}
 <body>
+  <script src="{% static "plot/js/index.js" %}"></script>
   <div>
     <form action='/plot/result/' method="post" class="form">
     {% csrf_token %}
@@ -28,33 +29,6 @@
   	<img src='{% url "img" data %}'/>
     {% endif %}
     {% if files_list %}
-      <script>
-        $(function(){
-          $('#multifile-form').submit(function(){
-            var checked_checkboxes = $('[name="selection-checkbox"]:checked');
-            if(checked_checkboxes.length > 0) {
-              var required_files = [];
-              checked_checkboxes.each(function(){
-                required_files.push($(this).attr("value"));
-              });
-              $('#files_array').attr('value', JSON.stringify(required_files));
-              return true;
-            }
-
-            return false;
-          });
-        });
-
-        $(function(){
-          $('.localfile-tr').hover(function(){
-            // console.log("in");
-            $(this).css("background-color", "#ffcccc");
-          }, function(){
-            // console.log("out");
-            $(this).css("background-color", "white");
-          });
-        })
-      </script>
       <form action='/download_multi_file/' method="post" class="form" id="multifile-form">
         {% csrf_token %}
         <input type="hidden" value='' id='files_array' name="files_array">

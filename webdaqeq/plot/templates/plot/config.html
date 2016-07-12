@@ -4,25 +4,10 @@
   {% load bootstrap3 %}
   {% load static %}
   <meta charset="utf-8">
-  <script type="text/javascript">
-
-  function enable(){
-    var isDisabled = !document.getElementById("check").checked;
-    document.getElementById("usr").disabled = isDisabled;
-    document.getElementById("pwd").disabled = isDisabled;
-  }
-
-  function startDAQEQ(){
-    return true;
-  }
-
-  function stopDAQEQ(){
-    return true;
-  }
-  </script>
   <head>
     <script src="{{STATIC_URL}}js/daqeq.js" type='text/javascript'></script>
     <script src="{% static "plot/js/daqeq.js" %}"></script>
+    <script src="{% static "plot/js/config.js" %}"></script>
     {% block title %}
   <title>{{ page_title }}</title>
   <!-- etc. -->
