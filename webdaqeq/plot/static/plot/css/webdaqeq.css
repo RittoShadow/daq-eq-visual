@@ -1,8 +1,19 @@
 /* Main app css */
 .navbar-nav li a {
- line-height: 50px;
+ line-height: 40px;
 }
+
 .navbar-rba-logo{
   width: auto;
-  height: 50px;
+  height: 40px;
+}
+
+.navbar-default{
+  background: #9b1338;
+}
+
+.navbar-default
+.navbar-nav li a {
+    color: #fff;
+    font-weight: bold;
 }
