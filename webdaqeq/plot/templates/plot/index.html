@@ -14,17 +14,6 @@
 <body>
   <script src="{% static "plot/js/index.js" %}"></script>
   <div>
-    <form action='/plot/result/' method="post" class="form">
-    {% csrf_token %}
-    {% if files_list %}
-    <select name="to_plot">
-      {% for b in files_list %}
-        <option value='{{b}}'>{{b}}</option>
-      {% endfor %}
-    </select>
-    <input type="submit" value="Graficar">
-    {% endif %}
-    </form>
     {% if plot %}
   	<img src='{% url "img" data %}'/>
     {% endif %}
@@ -32,8 +21,16 @@
       <form action='/download_multi_file/' method="post" class="form" id="multifile-form">
         {% csrf_token %}
         <input type="hidden" value='' id='files_array' name="files_array">
-        <input type="submit" value="Descargar seleccionados">
+        <button type="submit">
+          <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Descargar seleccionados
+        </button>
       </form>
+      <button onclick="check_all()">
+        <span class="glyphicon glyphicon-check" aria-hidden="true"></span> Seleccionar todo
+      </button>
+      <button onclick="uncheck_all()">
+        <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> Deseleccionar todo
+      </button>
       <div class="panel panel-default">
         <!-- Default panel contents -->
         <div class="panel-heading"><b>Archivos Locales</b></div>

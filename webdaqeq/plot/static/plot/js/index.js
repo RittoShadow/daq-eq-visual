@@ -24,3 +24,19 @@ $(function(){
     $(this).css("background-color", "white");
   });
 });
+
+// Marcar todos los checboxes
+function check_all()
+{
+  $('[name="selection-checkbox"]:not(:checked)').each(function(){
+    $(this).click();
+  });
+}
+
+// Desmarcar todos los checboxes
+function uncheck_all()
+{
+  $('[name="selection-checkbox"]:checked').each(function(){
+    $(this).click();
+  });
+}
