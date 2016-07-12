@@ -6,10 +6,11 @@
 {% bootstrap_javascript %}
 
 {% block bootstrap3_content %}
+{% load static %}
 <div class="container">
     <nav  class="navbar navbar-default">
         <div class="navbar-header">
-            <a class="navbar-brand" href="{% url 'plot/home' %}">RBA DAQ-EQ</a>
+            <a class="navbar-brand" href="{% url 'plot/home' %}"><img src="{% static "plot/img/acerca_rba_logo_small.png" %}"></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">

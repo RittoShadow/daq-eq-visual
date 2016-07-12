@@ -1,1 +1,8 @@
 /* Main app css */
+.navbar-nav li a {
+ line-height: 50px;
+}
+.navbar-rba-logo{
+  width: auto;
+  height: 50px;
+}
