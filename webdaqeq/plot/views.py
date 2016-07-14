@@ -146,7 +146,7 @@ def ask_daqeq_status():
 	except ValueError:
 		result = -1
 	if result == 0:
-		return "Reiniciar"
+		return "Guardar"
 	elif result == 1:
 		return "Detener"
 	else:
@@ -254,7 +254,7 @@ def notificationVerification(request):
 				command_server("ehst")
 			else:
 				command_server("ehsf")
-			command_server("0")
+			command_server("1")
 		else:
 			return request
 	return redirect(request.POST["this_url"])
@@ -362,7 +362,7 @@ def configVerification(request):
 					if len(sensorParams.split(";"))==18:
 						listSensorParams.append(sensorParams)
 			command_server("cas",listSensorParams)
-			command_server("0")
+			command_server("1")
 		else:
 			return request
 	return redirect(request.POST["this_url"])

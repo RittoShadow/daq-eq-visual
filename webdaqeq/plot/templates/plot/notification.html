@@ -33,7 +33,7 @@
 
   {% block content %}
   {% if user.is_authenticated %}
-    {% if action_text == "Reiniciar" %}
+    {% if action_text == "Guardar" %}
     <form role="form" id="notification_form" action="/plot/verify_notification/" name="verify" method="post" enctype="multipart/form-data" class="form-horizontal col-md-12">
       <div class="row">
         <div class="form-group col-sm-5">
