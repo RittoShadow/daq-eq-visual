@@ -27,6 +27,10 @@ class Configuration(models.Model):
     username = models.CharField(max_length=20,blank=True)
     password = models.CharField(max_length=20,blank=True)
     enableSecondTrigger = models.BooleanField(default=False)
+    detriggerObservationTime_m = models.IntegerField(default=0, validators=MinValueValidator(0))
+    detriggerObservationTime_s = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(59)])
+    releLiberationTime_m = models.IntegerField(default=0, validators=MinValueValidator(0))
+    releLiberationTime_s = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(59)])
 
 class Notification(models.Model):
     username = models.CharField(max_length=20,blank=True)
@@ -68,6 +72,10 @@ class configForm(ModelForm):
             'username': _('Usuario:'),
             'password': _('Password:'),
             'enableSecondTrigger': _('Habilitar Trigger Hard'),
+            'detriggerObservationTime_m': _('Minutos Observación Detrigger:'),
+            'detriggerObservationTime_s': _('Segundos Observación Detrigger:'),
+            'releLiberationTime_m': _('Minutos Liberación Relé:'),
+            'releLiberationTime_s': _('Segundos Liberación Relé:'),
         }
 
 class notifyForm(ModelForm):

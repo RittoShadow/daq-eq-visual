@@ -321,6 +321,20 @@ def configVerification(request):
 				command_server("sis",request.POST["username"])
 			if "password" in request.POST:
 				command_server("sps",request.POST["password"])
+			if "detriggerObservationTime_m" in request.POST:
+				if "detriggerObservationTime_s" in request.POST:
+					request.POST["detriggerObservationTime_s"] = repr(int(request.POST["detriggerObservationTime_s"]) + (int(request.POST["detriggerObservationTime_m"]) * 60))
+				else:
+					request.POST["detriggerObservationTime_s"] = repr(int(request.POST["detriggerObservationTime_m"]) * 60)
+			if "detriggerObservationTime_s" in request.POST:
+				command_server("nds",request.POST["detriggerObservationTime_s"])
+			if "releLiberationTime_m" in request.POST:
+				if "releLiberationTime_s" in request.POST:
+					request.POST["releLiberationTime_s"] = repr(int(request.POST["releLiberationTime_s"]) + (int(request.POST["releLiberationTime_m"]) * 60))
+				else:
+					request.POST["releLiberationTime_s"] = repr(int(request.POST["releLiberationTime_m"]) * 60)
+			if "releLiberationTime_s" in request.POST:
+				command_server("nls",request.POST["releLiberationTime_s"])
 			listSensorParams = []
 			if request.POST.getlist("serialNum"):
 				for i in range(len(request.POST.getlist("serialNum"))):
@@ -410,6 +424,16 @@ class ConfigurationFormView(FormView):
 			self.initial['outputDir'] = command_server("sog")
 			self.initial["username"] = command_server("sig")
 			self.initial["password"] = command_server("spg")
+			detrigger_obs_time_seconds = int(command_server("ndg"))
+			detrigger_obs_time_minutes = int(detrigger_obs_time_seconds/60)
+			detrigger_obs_time_seconds = detrigger_obs_time_seconds - (detrigger_obs_time_minutes * 60)
+			self.initial["detriggerObservationTime_m"] = detrigger_obs_time_minutes
+			self.initial["detriggerObservationTime_s"] = detrigger_obs_time_seconds
+			rele_lib_time_seconds = int(command_server("nlg"))
+			rele_lib_time_minutes = int(rele_lib_time_seconds/60)
+			rele_lib_time_seconds = rele_lib_time_seconds - (rele_lib_time_minutes * 60)
+			self.initial["releLiberationTime_m"] = rele_lib_time_minutes
+			self.initial["releLiberationTime_s"]= rele_lib_time_seconds
 			if command_server("eng") == "1":
 				self.initial['enableSecondTrigger'] = 'on'
 			else:
