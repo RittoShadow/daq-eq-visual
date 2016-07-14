@@ -1,4 +1,19 @@
 // Main javascript
+// Globales --------------------------------------------------------------------
+var message_duration = 5000; // <-- time in milliseconds, 1000 =  1 sec
+
+// OnReady ---------------------------------------------------------------------
+$(function(){
+  
+  // Desaparecer mensajes flash pasados "message_duration" segundos
+  setTimeout(function() {
+    $('.alert').fadeOut('slow');
+  }, message_duration);
+
+});
+
+
+// Funciones -------------------------------------------------------------------
 
 // Deshabilitar button perteneciente a un span, y cambiar icono
 function disable_submit_span() {

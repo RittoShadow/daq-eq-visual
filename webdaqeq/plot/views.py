@@ -7,6 +7,7 @@ from django.views.generic import FormView
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt,csrf_protect
 
 # Standard
@@ -255,6 +256,8 @@ def notificationVerification(request):
 			else:
 				command_server("ehsf")
 			command_server("1")
+			messages.success(request, 'Se han guardado configuraciones las configuraciones.')
+			return redirect(view)
 		else:
 			return request
 	return redirect(request.POST["this_url"])
@@ -363,6 +366,8 @@ def configVerification(request):
 						listSensorParams.append(sensorParams)
 			command_server("cas",listSensorParams)
 			command_server("1")
+			messages.success(request, 'Se han guardado configuraciones las configuraciones.')
+			return redirect(view)
 		else:
 			return request
 	return redirect(request.POST["this_url"])
