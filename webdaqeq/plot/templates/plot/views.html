@@ -28,9 +28,8 @@
       data: {'command' : value, 'this_url' : '{{this_url}}'},
       success: function (response) {
 
-          }
-
-        });
+      }
+    });
     }
 </script>
 
@@ -38,7 +37,7 @@
 
 <body>
   {% block title %}
-  Servicio de Graficación DAQ-EQ ^mini
+  Servicio de Graficación DAQ-EQ
   {% endblock %}
   {% block content %}
 <input type="hidden" id="websocket-ip" value="{{ ip }}">
