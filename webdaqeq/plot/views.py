@@ -157,7 +157,7 @@ def ask_daqeq_status():
 def view(request):
 	ip = net.ifaddresses('eth0')[2][0]['addr']
 	# ip = 'localhost'
-	return render(request, 'plot/views.html', { "this_url" : "/plot/views/", "ip" : ip})
+	return render(request, 'plot/views.html', { "this_url" : "/plot/views/", "ip" : ip, "running_status" : daqeq_is_running()})
 
 @csrf_exempt #This skips csrf validation. Use csrf_protect to have validation
 @login_required(login_url="/plot/login/")

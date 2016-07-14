@@ -14,24 +14,12 @@
 <script src="{% static "plot/js/bootstrap.min.js" %}"></script>
 <script src="{% static "plot/js/canvasjs.min.js" %}"></script>
 <script src="{% static "plot/js/djangoAjax.js" %}"></script>
+<script src="{% static "plot/js/views.js" %}"></script>
 
 <!-- <script src="{% static "plot/js/chart2.1.4.bundle.js" %}"></script> -->
 <script src="{% static "plot/js/client-websocket.js" %}"></script>
 <!-- <script src="{% static "plot/js/graficador.js" %}"></script> -->
 <script src="{% static "plot/js/graficador2.js" %}"></script>
-<script type="text/javascript">
-  function sendSignal(value){
-    $.ajax({
-      url: '/plot/signal/',
-      type: "POST",
-      async: false,
-      data: {'command' : value, 'this_url' : '{{this_url}}'},
-      success: function (response) {
-
-      }
-    });
-    }
-</script>
 
 {% endblock %}
 
@@ -49,13 +37,13 @@
     <button type="button" class="btn btn-success" id="start-btn" style="display: none" onclick="setShowPlot();">
       <span class="glyphicon glyphicon-play" aria-hidden="true"></span>Reiniciar vistas
     </button>
-    <button type="button" class="btn btn-default iniciar-app" onclick="sendSignal('start')">
+    <button type="button" class="btn btn-default iniciar-app" id='daqeq-start-btn' onclick="sendSignal('start')">
       <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Iniciar Aplicación
     </button>
-    <button type="button" class="btn btn-default detener-app" onclick="sendSignal('stop')">
+    <button type="button" class="btn btn-default detener-app" id='daqeq-stop-btn' onclick="sendSignal('stop')">
       <span class="glyphicon glyphicon-stop" aria-hidden="true"></span> Detener Aplicación
     </button>
-    <button type="button" class="btn btn-default forzar-trigger" onclick="sendSignal('trigger')">
+    <button type="button" class="btn btn-default forzar-trigger" id='daqeq-trigger-btn' onclick="sendSignal('trigger')">
       <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Forzar Trigger
     </button>
 
@@ -84,7 +72,7 @@
 
 
 
-
+<input id="views-data" type="hidden" data-url="{{ this_url}}" data-running="{{ running_status }}">
 {% endblock %}
 </body>
 </html>
