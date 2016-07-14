@@ -358,7 +358,7 @@ class ConfigurationFormView(FormView):
 	"""
 	Datos de vista de configuraciones
 	"""
-	template_name = 'plot/notification.html'
+	template_name = 'plot/config.html'
 	form_class = configForm
 
 	def __init__(self, *args, **kwargs):
