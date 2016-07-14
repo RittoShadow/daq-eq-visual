@@ -210,9 +210,60 @@ def download_multi_file(request):
 	return response
 
 @login_required(login_url="/plot/login/")
+def notificationVerification(request):
+	"""
+	Guardar configuraciones hechas en notification
+	"""
+	route = settings.BASE_DIR+"/plot"
+	os.chdir(route)
+	if request.method == "POST":
+		if request.POST["this_url"] == "/plot/notification/":
+			if "sendFrequency" in request.POST:
+				command_server("nss",request.POST["sendFrequency"])
+			if "verificationFrequency" in request.POST:
+				command_server("nos",request.POST["verificationFrequency"])
+			if "username" in request.POST:
+				command_server("sis",request.POST["username"])
+			if "password" in request.POST:
+				command_server("sps",request.POST["password"])
+			if "structure" in request.POST:
+				command_server("sss",request.POST["structure"])
+			if "email" in request.POST:
+				command_server("ses",request.POST["email"])
+			if "phoneNumber" in request.POST:
+				command_server("sts",request.POST["phoneNumber"])
+			if "authenticationURL" in request.POST:
+				command_server("sas",request.POST["authenticationURL"])
+			if "recordURL" in request.POST:
+				command_server("srs",request.POST["recordURL"])
+			if "structHealthURL" in request.POST:
+				command_server("shs",request.POST["structHealthURL"])
+			if "sendSMS" in request.POST:
+				command_server("emst")
+			else:
+				command_server("emsf")
+			if "sendRecord" in request.POST:
+				command_server("esst")
+			else:
+				command_server("essf")
+			if "compressRecord" in request.POST:
+				command_server("ecst")
+			else:
+				command_server("ecsf")
+			if "sendStructHealth" in request.POST:
+				command_server("ehst")
+			else:
+				command_server("ehsf")
+			command_server("0")
+		else:
+			return request
+	return redirect(request.POST["this_url"])
+
+
+@login_required(login_url="/plot/login/")
 def configVerification(request):
 	"""
-	Guardar configuraciones hechas en config o notification
+	Guardar configuraciones hechas en config
 	"""
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
@@ -239,33 +290,33 @@ def configVerification(request):
 				# 	command_server("nts",request.POST["secondTriggerThresh"])
 			else:
 				command_server("ensf")
-			if request.POST["graphWindow"]:
+			if "graphWindow" in request.POST:
 				command_server("ngs",request.POST["graphWindow"])
-			if request.POST["filterWindow"]:
+			if "filterWindow" in request.POST:
 				command_server("nfs",request.POST["filterWindow"])
-			if request.POST["preEventTime"]:
+			if "preEventTime" in request.POST:
 				command_server("nas",request.POST["preEventTime"])
-			if request.POST["postEventTime"]:
+			if "postEventTime" in request.POST:
 				command_server("nbs",request.POST["postEventTime"])
-			if request.POST["minTimeRunning"]:
+			if "minTimeRunning" in request.POST:
 				command_server("nms",request.POST["minTimeRunning"])
-			if request.POST["votes"]:
+			if "votes" in request.POST:
 				command_server("nvs",request.POST["votes"])
-			if request.POST["recordLength"]:
+			if "recordLength" in request.POST:
 				command_server("nrs",request.POST["recordLength"])
-			if request.POST["portNumber"]:
+			if "portNumber" in request.POST:
 				command_server("nps",request.POST["portNumber"])
-			if request.POST["filenameFormat"]:
+			if "filenameFormat" in request.POST:
 				command_server("sfs",request.POST["filenameFormat"])
-			if request.POST["serverURL"]:
+			if "serverURL" in request.POST:
 				command_server("sus",request.POST["serverURL"])
-			if request.POST["networkName"]:
+			if "networkName" in request.POST:
 				command_server("sns",request.POST["networkName"])
-			if request.POST["outputDir"]:
+			if "outputDir" in request.POST:
 				command_server("sos",request.POST["outputDir"])
-			if request.POST["username"]:
+			if "username" in request.POST:
 				command_server("sis",request.POST["username"])
-			if request.POST["password"]:
+			if "password" in request.POST:
 				command_server("sps",request.POST["password"])
 			listSensorParams = []
 			if request.POST.getlist("serialNum"):
@@ -311,44 +362,6 @@ def configVerification(request):
 					if len(sensorParams.split(";"))==18:
 						listSensorParams.append(sensorParams)
 			command_server("cas",listSensorParams)
-			command_server("0")
-		elif request.POST["this_url"] == "/plot/notification/":
-			if request.POST["sendFrequency"]:
-				command_server("nss",request.POST["sendFrequency"])
-			if request.POST["verificationFrequency"]:
-				command_server("nos",request.POST["verificationFrequency"])
-			if request.POST["username"]:
-				command_server("sis",request.POST["username"])
-			if request.POST["password"]:
-				command_server("sps",request.POST["password"])
-			if request.POST["structure"]:
-				command_server("sss",request.POST["structure"])
-			if request.POST["email"]:
-				command_server("ses",request.POST["email"])
-			if request.POST["phoneNumber"]:
-				command_server("sts",request.POST["phoneNumber"])
-			if request.POST["authenticationURL"]:
-				command_server("sas",request.POST["authenticationURL"])
-			if request.POST["recordURL"]:
-				command_server("srs",request.POST["recordURL"])
-			if request.POST["structHealthURL"]:
-				command_server("shs",request.POST["structHealthURL"])
-			if "sendSMS" in request.POST:
-				command_server("emst")
-			else:
-				command_server("emsf")
-			if "sendRecord" in request.POST:
-				command_server("esst")
-			else:
-				command_server("essf")
-			if "compressRecord" in request.POST:
-				command_server("ecst")
-			else:
-				command_server("ecsf")
-			if "sendStructHealth" in request.POST:
-				command_server("ehst")
-			else:
-				command_server("ehsf")
 			command_server("0")
 		else:
 			return request

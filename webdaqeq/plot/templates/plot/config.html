@@ -7,7 +7,6 @@
   {% block meta %}
     <meta charset="utf-8">
     <script src="{% static "plot/js/jquery-1.12.3.min.js" %}"></script>
-    <script src="{% static "plot/js/validations.js" %}"></script>
     <script src="{% static "plot/js/djangoAjax.js" %}"></script>
     <script src="{% static "plot/js/config.js" %}"></script>
   <style type="text/css">
@@ -35,7 +34,7 @@
   {% block content %}
   {% if user.is_authenticated %}
     {% if action_text == "Reiniciar" %}
-    <form role="form" id="config_form" action="/plot/verify/" name="config" method="post" enctype="multipart/form-data" class="form-horizontal col-md-12">
+    <form role="form" id="config_form" action="/plot/verify_config/" name="verify" method="post" enctype="multipart/form-data" class="form-horizontal col-md-12">
       <div class="row">
         <div class="form-group col-sm-5">
           {% csrf_token %}
@@ -126,7 +125,6 @@
       <input type="hidden" name="this_url" value="{{this_url}}">
     </form>
     {% else %}
-      <p>Para hacer cambios, debe detener la aplicación primero.</p>
       <form role="form" method="post" action="/plot/signal/">
         {% csrf_token %}
         <div class="row">
@@ -136,25 +134,11 @@
           <input type="hidden" name="this_url" value="{{this_url}}">
         </div>
       </form>
+      <br>
+      <p>Para hacer cambios, debe detener la aplicación primero.</p>
     {% endif %}
   {% else %}
-    <form method="post" action="{% url 'login' %}">
-      {% csrf_token %}
-      <table>
-      <tr>
-          <td>Nombre de usuario</td>
-          <td><input type="text" name="username"></td>
-      </tr>
-      <tr>
-          <td>Contraseña</td>
-          <td><input type="password" name="password"></td>
-      </tr>
-      </table>
-
-      <input type="submit" value="Login" />
-      <input type="hidden" name="next" value="{{this_url}}" />
-      <input class="col-md-12" type="hidden" name="this_url" value="{{this_url}}">
-    </form>
+  Requiere iniciar sesión
   {% endif %}
 {% endblock %}
 </html>
