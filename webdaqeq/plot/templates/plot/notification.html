@@ -40,16 +40,6 @@
         <div class="form-group col-sm-5">
           {% csrf_token %}
           {% bootstrap_form form layout='horizontal' %}
-          <div class="form-group">
-            <label class="col-md-3 control-label" for="id_enableSecondTrigger">&#160;</label>
-            <div class="col-md-9">
-              <div class="checkbox">
-                <label for="id_enableSecondTrigger">
-                  <input id="id_enableSecondTrigger" name="enableSecondTrigger" {% if secondTrigger %}checked="checked"{% endif %} type="checkbox" onchange="secondTrigger()"/> Habilitar segundo trigger
-                </label>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div class="col-xs-5 col-xs-offset-1">
@@ -61,10 +51,10 @@
                 <th class="col-xs-1">N° de serie</th>
                 <th class="col-xs-1">Posición</th>
                 <th class="col-xs-1">Detrend</th>
-                <th class="col-xs-3">Trigger(x,y,z):</th>
-                <th class="col-xs-3">Detrigger(x,y,z):</th>
-                <th class="col-xs-2">Votos:</th>
-                <th class="col-xs-1">Trigger máximo(x,y,z):</th>
+                <th class="col-xs-3">Trigger Soft (x,y,z):</th>
+                <th class="col-xs-3">Detrigger (x,y,z):</th>
+                <th class="col-xs-2">Votos (x,y,z):</th>
+                <th class="col-xs-1">Trigger Hard (x,y,z):</th>
               </tr>
               <tr>
                 <td class="col-xs-1">

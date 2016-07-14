@@ -26,6 +26,7 @@ class Configuration(models.Model):
     allowClient = models.BooleanField(default=False)
     username = models.CharField(max_length=20,blank=True)
     password = models.CharField(max_length=20,blank=True)
+    enableSecondTrigger = models.BooleanField(default=False)
 
 class Notification(models.Model):
     username = models.CharField(max_length=20,blank=True)
@@ -66,6 +67,7 @@ class configForm(ModelForm):
             'allowClient': _('Permitir configuración de cliente'),
             'username': _('Usuario:'),
             'password': _('Password:'),
+            'enableSecondTrigger': _('Habilitar Trigger Hard'),
         }
 
 class notifyForm(ModelForm):

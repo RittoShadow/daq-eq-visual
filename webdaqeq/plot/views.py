@@ -392,6 +392,10 @@ class ConfigurationFormView(FormView):
 			self.initial['outputDir'] = command_server("sog")
 			self.initial["username"] = command_server("sig")
 			self.initial["password"] = command_server("spg")
+			if command_server("eng") == "1":
+				self.initial['enableSecondTrigger'] = 'on'
+			else:
+				self.initial['enableSecondTrigger'] = None
 		super(ConfigurationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
@@ -401,10 +405,6 @@ class ConfigurationFormView(FormView):
 		context["action_text"] = ask_daqeq_status()
 		command_server("elg")
 		context["sensors"] = command_server("cag")
-		if command_server("eng") == "1":
-			context["secondTrigger"] = True
-		else:
-			context["secondTrigger"] = False
 		return context
 
 
