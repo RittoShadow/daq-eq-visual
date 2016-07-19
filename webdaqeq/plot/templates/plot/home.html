@@ -22,6 +22,7 @@
                 <li><a href="/plot/views/">Visualizaciones</a></li>
                 <li><a href="/plot/config/">Configuración</a></li>
                 <li><a href="/plot/notification/">Notificaciones</a></li>
+                <li><a href="/plot/script_configuration/">Scripts</a></li>
                 <li>
                   {% if user.is_authenticated %}
                     <a href="/plot/logout/">Cerrar sesión</a>
@@ -35,6 +36,7 @@
     <script src="{% static "plot/js/jquery-1.12.4.min.js" %}"></script>
     <script src="{% static "plot/js/bootstrap.min.js" %}"></script>
     <script src="{% static "plot/js/webdaqeq.js" %}"></script>
+    <script src="{% static "plot/js/djangoAjax.js" %}"></script>
 
     {% block meta %}
     {% endblock %}

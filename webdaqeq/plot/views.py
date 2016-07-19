@@ -256,12 +256,11 @@ def notificationVerification(request):
 			else:
 				command_server("ehsf")
 			command_server("1")
-			messages.success(request, 'Se han guardado configuraciones las configuraciones.')
+			messages.success(request, 'Se han guardado los cambios en las notificaciones.')
 			return redirect(view)
 		else:
 			return request
 	return redirect(request.POST["this_url"])
-
 
 @login_required(login_url="/plot/login/")
 def configVerification(request):
@@ -380,7 +379,7 @@ def configVerification(request):
 						listSensorParams.append(sensorParams)
 			command_server("cas",listSensorParams)
 			command_server("1")
-			messages.success(request, 'Se han guardado configuraciones las configuraciones.')
+			messages.success(request, 'Se han guardado los cambios en configuraciones.')
 			return redirect(view)
 		else:
 			return request
@@ -496,3 +495,50 @@ class NotificationFormView(FormView):
 		context["this_url"] = "/plot/notification/"
 		context["action_text"] = ask_daqeq_status()
 		return context
+
+@login_required(login_url="/plot/login/")
+def scriptConfiguration(request):
+	"""
+	Configuraciones de Scripts
+	"""
+	if request.method == 'POST':
+		# Si es POST, guardar data
+		if request.POST["this_url"] == "plot/script_configuration":
+			print "TEST"
+			if "onTrigger1" in request.POST:
+				print request.POST["onTrigger1"]
+				# command_server("sat1s",request.POST["onTrigger1"])
+			if "onTrigger2" in request.POST:
+				print request.POST["onTrigger2"]
+				# command_server("sat2s",request.POST["onTrigger2"])
+			if "onMaxTrigger1" in request.POST:
+				print request.POST["onMaxTrigger1"]
+				# command_server("sam1s",request.POST["onMaxTrigger1"])
+			# command_server("1")
+			# messages.success(request, 'Se han guardado los cambios en los scripts.')
+			# return redirect(view)
+		messages.error(request, 'No se han guardado los cambios en los scripts.')
+	if daqeq_is_running() == False:
+		# onTrigger1 = command_server("sat1g")
+		# onTrigger2 = command_server("sat2g")
+		# onMaxTrigger1 = command_server("sam1g")
+		# scriptList = command_server("csl").split(";")
+		onTrigger1 = "script1.py"
+		onTrigger2 = "script2.py"
+		onMaxTrigger1 = "Maxscript1.py"
+		scriptList = "scr1.py;scr2.py;scr3.py;".split(";")
+	else:
+		onTrigger1 = onTrigger2 = onMaxTrigger1 = scriptList = ""
+	parameters = {
+		# contexto
+		"page_title" : "Scripts",
+		"this_url" : "plot/script_configuration",
+		"action_text" : ask_daqeq_status(),
+		# Valores iniciales
+		'onTrigger1' : onTrigger1,
+		'onTrigger2' : onTrigger2,
+		'onMaxTrigger1' : onMaxTrigger1,
+		# Lista de Scripts
+		'scriptList' : scriptList
+	}
+	return render(request, 'plot/script_configuration.html', parameters)

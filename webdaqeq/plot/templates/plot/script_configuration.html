@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+  {% extends 'plot/home.html' %}
+  {% load bootstrap3 %}
+  {% load staticfiles %}
+
+  {% block meta %}
+    <meta charset="utf-8">
+  <style type="text/css">
+
+    .icon-input-btn{
+
+        display: inline-block;
+        position: relative;
+    }
+
+    .icon-input-btn .glyphicon{
+
+        display: inline-block;
+        position: absolute;
+        left: 0.35em;
+        top: 30%;
+    }
+    </style>
+  {% endblock %}
+
+  {% block title %}
+    {{page_title}}
+  {% endblock %}
+
+  {% block content %}
+  {% if user.is_authenticated %}
+    {% if action_text == "Guardar" %}
+    <form id="scripts_form" action="" name="verify" method="post" enctype="multipart/form-data" class="form-horizontal col-md-12">
+      <div class="row">
+        <div class="form-group col-sm-5">
+          {% csrf_token %}
+          <label for="onTrigger1">Script en Trigger 1:</label>
+          <input type="text" value="{{ onTrigger1 }}" disabled>
+          <select name="onTrigger1">
+            {% for elem in scriptList %}
+              <option value="{{ elem }}">{{ elem }}</option>
+            {% endfor %}
+          </select>
+          <label for="onTrigger2">Script en Trigger 2:</label>
+          <input type="text" value="{{ onTrigger2 }}" disabled>
+          <select name="onTrigger2">
+            {% for elem in scriptList %}
+              <option value="{{ elem }}">{{ elem }}</option>
+            {% endfor %}
+          </select>
+          <label for="onMaxTrigger1">Script en Trigger 1:</label>
+          <input type="text" value="{{ onMaxTrigger1 }}" disabled>
+          <select name="onMaxTrigger1">
+            {% for elem in scriptList %}
+              <option value="{{ elem }}">{{ elem }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <button type="submit" name="action" class="btn btn-default col-md-1" value="{{ action_text }}">
+        <span class="glyphicon glyphicon-floppy-disk submit-span" aria-hidden="true"></span> {{ action_text }}
+      </button>
+      <input type="hidden" id="this_url" name="this_url" value="{{ this_url }}">
+    </form>
+    {% else %}
+      <form role="form" method="post" action="/plot/signal/">
+        {% csrf_token %}
+        <div class="row">
+          <button type="submit" name="action" class="btn btn-default col-md-1" value="{{ action_text }}" onclick="disable_submit_span()">
+            <span class="glyphicon glyphicon-stop submit-span" aria-hidden="true"></span> {{ action_text }}
+          </button>
+          <input type="hidden" name="this_url" value="{{ this_url }}">
+        </div>
+      </form>
+      <br>
+      <p>Para hacer cambios, debe detener la aplicación primero.</p>
+    {% endif %}
+  {% else %}
+    Requiere iniciar sesión
+  {% endif %}
+{% endblock %}
+</html>
