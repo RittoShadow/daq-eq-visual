@@ -522,11 +522,11 @@ def scriptConfiguration(request):
 		# onTrigger1 = command_server("sat1g")
 		# onTrigger2 = command_server("sat2g")
 		# onMaxTrigger1 = command_server("sam1g")
-		# scriptList = command_server("csg")
+		scriptList = command_server("csg")
 		onTrigger1 = "script1.py"
 		onTrigger2 = "script2.py"
 		onMaxTrigger1 = "Maxscript1.py"
-		scriptList = "scr1.py;script2.py;scr3.py;".split(";")
+		# scriptList = "scr1.py;script2.py;scr3.py;".split(";")
 		scriptList = scriptList[-1:] + scriptList[:-1]
 	else:
 		onTrigger1 = onTrigger2 = onMaxTrigger1 = scriptList = ""

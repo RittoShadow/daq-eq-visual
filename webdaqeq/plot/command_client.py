@@ -70,7 +70,7 @@ def command_server(message, params=None):
             s.recv(4096)
             print message + ": sending param"
             s.sendall(params)
-        if (message == "cag") or (message == "csg"): #Aviso que quiero sensores
+        if message == "cag": #Aviso que quiero sensores
             reply = []
             while True: #Recibo sensores hasta que me llegue una "r"
                 print message + " : waiting k or r"
@@ -81,12 +81,10 @@ def command_server(message, params=None):
                     print message + " : return reply"
                     s.close()
                     return reply
-                    # break
                 print message + " : appending " + r
                 reply.append(r.split(";")) #Guardo el sensor
                 print message + " : sending k"
                 s.sendall("k")
-            # s.sendall("k")
         if message == "cas":
             print message + " : waiting k"
             s.recv(4096)
@@ -98,6 +96,21 @@ def command_server(message, params=None):
                 s.recv(4096)
             print message + " : finished sending sensors waiting k"
             s.sendall("k")
+        if message == "csg": #Aviso que quiero scripts
+            reply = ""
+            while True: #Recibo nombres hasta que me llegue una "r"
+                print message + " : waiting k or r"
+                r = s.recv(4096) #Recibo nombre de script
+                if r == "r":
+                    print message + " : received r, sending k"
+                    s.sendall("k")
+                    print message + " : return reply"
+                    s.close()
+                    return (reply).split(";")
+                print message + " : appending " + r
+                reply+=r #Guardo el script
+                print message + " : sending k"
+                s.sendall("k")
 
     except socket.error:
         #Send failed
