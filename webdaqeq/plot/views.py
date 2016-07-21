@@ -527,6 +527,7 @@ def scriptConfiguration(request):
 		onTrigger2 = "script2.py"
 		onMaxTrigger1 = "Maxscript1.py"
 		scriptList = "scr1.py;script2.py;scr3.py;".split(";")
+		scriptList = scriptList[-1:] + scriptList[:-1]
 	else:
 		onTrigger1 = onTrigger2 = onMaxTrigger1 = scriptList = ""
 	parameters = {
