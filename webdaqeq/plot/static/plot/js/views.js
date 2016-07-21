@@ -15,6 +15,9 @@ function sendSignal(value){
         case 'trigger':
           $('#daqeq-stop-btn').attr('disabled', false);
           $('#daqeq-trigger-btn').attr('disabled', false);
+          if ($('#views-data').attr('data-running') == 'False') {
+            location.reload();
+          }
           break;
         case 'stop':
           $('#daqeq-start-btn').attr('disabled', false);
