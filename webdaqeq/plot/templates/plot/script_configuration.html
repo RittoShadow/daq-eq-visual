@@ -36,24 +36,24 @@
         <div class="form-group col-sm-5">
           {% csrf_token %}
           <label for="onTrigger1">Script en Trigger 1:</label>
-          <input type="text" value="{{ onTrigger1 }}" disabled>
+          <input type="text" value="{{ onTrigger1 }}" {% if not onTrigger1 in scriptList %} class="text-danger" {% endif %} disabled>
           <select name="onTrigger1">
             {% for elem in scriptList %}
-              <option value="{{ elem }}">{{ elem }}</option>
+              <option value="{{ elem }}" {% if elem == onTrigger1 %} selected="selected" {% endif %}>{{ elem }}</option>
             {% endfor %}
           </select>
           <label for="onTrigger2">Script en Trigger 2:</label>
-          <input type="text" value="{{ onTrigger2 }}" disabled>
+          <input type="text" value="{{ onTrigger2 }}" {% if not onTrigger2 in scriptList %} class="text-danger" {% endif %} disabled>
           <select name="onTrigger2">
             {% for elem in scriptList %}
-              <option value="{{ elem }}">{{ elem }}</option>
+              <option value="{{ elem }}" {% if elem == onTrigger2 %} selected="selected" {% endif %}>{{ elem }}</option>
             {% endfor %}
           </select>
           <label for="onMaxTrigger1">Script en Trigger 1:</label>
-          <input type="text" value="{{ onMaxTrigger1 }}" disabled>
+          <input type="text" value="{{ onMaxTrigger1 }}" {% if not onMaxTrigger1 in scriptList %} class="text-danger" {% endif %} disabled>
           <select name="onMaxTrigger1">
             {% for elem in scriptList %}
-              <option value="{{ elem }}">{{ elem }}</option>
+              <option value="{{ elem }}" {% if elem == onMaxTrigger1 %} selected="selected" {% endif %}>{{ elem }}</option>
             {% endfor %}
           </select>
         </div>

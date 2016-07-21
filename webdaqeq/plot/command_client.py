@@ -70,7 +70,7 @@ def command_server(message, params=None):
             s.recv(4096)
             print message + ": sending param"
             s.sendall(params)
-        if message == "cag": #Aviso que quiero sensores
+        if (message == "cag") or (message == "csg"): #Aviso que quiero sensores
             reply = []
             while True: #Recibo sensores hasta que me llegue una "r"
                 print message + " : waiting k or r"
