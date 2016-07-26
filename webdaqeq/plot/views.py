@@ -520,7 +520,8 @@ def scriptConfiguration(request):
 		onTrigger2 = command_server("sat2g")
 		onMaxTrigger1 = command_server("sam1g")
 		scriptList = command_server("csg")
-		scriptList = scriptList[-1:] + scriptList[:-1]
+		# scriptList = scriptList[-1:] + scriptList[:-1]
+		scriptList = scriptList[:-1]
 	else:
 		onTrigger1 = onTrigger2 = onMaxTrigger1 = scriptList = ""
 	parameters = {
