@@ -506,17 +506,14 @@ def scriptConfiguration(request):
 		if request.POST["this_url"] == "plot/script_configuration":
 			print "TEST"
 			if "onTrigger1" in request.POST:
-				print request.POST["onTrigger1"]
-				# command_server("sat1s",request.POST["onTrigger1"])
+				command_server("sat1s",request.POST["onTrigger1"])
 			if "onTrigger2" in request.POST:
-				print request.POST["onTrigger2"]
-				# command_server("sat2s",request.POST["onTrigger2"])
+				command_server("sat2s",request.POST["onTrigger2"])
 			if "onMaxTrigger1" in request.POST:
-				print request.POST["onMaxTrigger1"]
-				# command_server("sam1s",request.POST["onMaxTrigger1"])
-			# command_server("1")
-			# messages.success(request, 'Se han guardado los cambios en los scripts.')
-			# return redirect(view)
+				command_server("sam1s",request.POST["onMaxTrigger1"])
+			command_server("1")
+			messages.success(request, 'Se han guardado los cambios en los scripts.')
+			return redirect(view)
 		messages.error(request, 'No se han guardado los cambios en los scripts.')
 	if daqeq_is_running() == False:
 		onTrigger1 = command_server("sat1g")

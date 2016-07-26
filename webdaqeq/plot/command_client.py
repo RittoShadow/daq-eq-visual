@@ -60,16 +60,25 @@ def command_server(message, params=None):
         #Set the whole string
         print message + " : sending the message"
         s.sendall(message)
+        # Guardar datos numericos
         if re.search("n\ws", message):
             print message + " : waiting k"
             s.recv(4096)
             print message + ": sending param"
             s.sendall(params)
+        # Guardar datos strings
         if re.search("s\ws", message):
             print message + " : waiting k"
             s.recv(4096)
             print message + ": sending param"
             s.sendall(params)
+        # Guardar datos de strings de scripts
+        if re.search("sa\w\ds", message):
+            print message + " : waiting k"
+            s.recv(4096)
+            print message + ": sending param"
+            s.sendall(params)
+        # Obtener datos de sensores
         if message == "cag": #Aviso que quiero sensores
             reply = []
             while True: #Recibo sensores hasta que me llegue una "r"
@@ -85,6 +94,7 @@ def command_server(message, params=None):
                 reply.append(r.split(";")) #Guardo el sensor
                 print message + " : sending k"
                 s.sendall("k")
+        # Guardar datos de sensores
         if message == "cas":
             print message + " : waiting k"
             s.recv(4096)
@@ -96,6 +106,7 @@ def command_server(message, params=None):
                 s.recv(4096)
             print message + " : finished sending sensors waiting k"
             s.sendall("k")
+        # Obtener lista de scripts
         if message == "csg": #Aviso que quiero scripts
             reply = ""
             while True: #Recibo nombres hasta que me llegue una "r"
