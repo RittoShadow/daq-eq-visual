@@ -4,6 +4,8 @@ function sendSignal(value){
   $('#daqeq-stop-btn').attr('disabled', true);
   $('#daqeq-trigger-btn').attr('disabled', true);
 
+  var reload_required = false;
+
   $.ajax({
     url: '/plot/signal/',
     type: "POST",
@@ -16,7 +18,7 @@ function sendSignal(value){
           $('#daqeq-stop-btn').attr('disabled', false);
           $('#daqeq-trigger-btn').attr('disabled', false);
           if ($('#views-data').attr('data-running') == 'False') {
-            location.reload();
+            reload_required = true;
           }
           break;
         case 'stop':
@@ -37,7 +39,11 @@ function sendSignal(value){
       }
     }
   });
+
+  if (reload_required) {
+    location.reload();
   }
+}
 
 // On Ready
 $(function(){
