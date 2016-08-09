@@ -277,6 +277,10 @@ def configVerification(request):
 				command_server("east")
 			else:
 				command_server("easf")
+			if "enableFilteredVisualization" in request.POST:
+				command_server("evst")
+			else:
+				command_server("evsf")
 			if "enableTrigger" in request.POST:
 				command_server("etst")
 			else:
@@ -409,6 +413,10 @@ class ConfigurationFormView(FormView):
 				self.initial['enableRecording'] = 'on'
 			else:
 				self.initial['enableRecording'] = None
+			if command_server("evg") == "1":
+				self.initial['enableFilteredVisualization'] = 'on'
+			else:
+				self.initial['enableFilteredVisualization'] = None
 			self.initial['graphWindow'] = command_server("ngg")
 			self.initial['filterWindow'] = command_server("nfg")
 			self.initial['preEventTime'] = command_server("nag")
