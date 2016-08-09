@@ -8,6 +8,7 @@ from django.core.validators import *
 from django.utils.translation import ugettext_lazy as _
 
 class Configuration(models.Model):
+    enableFilteredVisualization = models.BooleanField(default=False)
     graphWindow = models.IntegerField(default=5, validators=MinValueValidator(5))
     filterWindow = models.IntegerField(default=10, validators=MinValueValidator(10))
     preEventTime = models.IntegerField(default=10, validators=MinValueValidator(10))
@@ -53,6 +54,7 @@ class configForm(ModelForm):
         model = Configuration
         fields = '__all__'
         labels = {
+            'enableFilteredVisualization': _('Visualizar Data Filtrada'),
             'graphWindow': _('Ventana de gráfico:'),
             'filterWindow': _('Ventana de filtro:'),
             'preEventTime': _('Pre-evento:'),
