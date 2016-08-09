@@ -26,12 +26,17 @@ class Configuration(models.Model):
     allowClient = models.BooleanField(default=False)
     username = models.CharField(max_length=20,blank=True)
     password = models.CharField(max_length=20,blank=True)
+    enableSecondTrigger = models.BooleanField(default=False)
+    detriggerObservationTime_m = models.IntegerField(default=0, validators=MinValueValidator(0))
+    detriggerObservationTime_s = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(59)])
+    releLiberationTime_m = models.IntegerField(default=0, validators=MinValueValidator(0))
+    releLiberationTime_s = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(59)])
 
 class Notification(models.Model):
     username = models.CharField(max_length=20,blank=True)
     password = models.CharField(max_length=20,blank=True)
     structure = models.CharField(max_length=10)
-    email = models.EmailField(max_length=50)
+    email = models.EmailField(max_length=50, blank=True)
     phoneNumber = models.CharField(max_length=15,blank=True)
     sendSMS = models.BooleanField(default=False)
     sendRecord = models.BooleanField(default=False)
@@ -66,6 +71,11 @@ class configForm(ModelForm):
             'allowClient': _('Permitir configuración de cliente'),
             'username': _('Usuario:'),
             'password': _('Password:'),
+            'enableSecondTrigger': _('Habilitar Trigger Hard'),
+            'detriggerObservationTime_m': _('Minutos Observación Detrigger:'),
+            'detriggerObservationTime_s': _('Segundos Observación Detrigger:'),
+            'releLiberationTime_m': _('Minutos Liberación Relé:'),
+            'releLiberationTime_s': _('Segundos Liberación Relé:'),
         }
 
 class notifyForm(ModelForm):

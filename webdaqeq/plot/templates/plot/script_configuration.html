@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+  {% extends 'plot/home.html' %}
+  {% load bootstrap3 %}
+  {% load staticfiles %}
+
+  {% block meta %}
+    <meta charset="utf-8">
+  <style type="text/css">
+
+    .icon-input-btn{
+
+        display: inline-block;
+        position: relative;
+    }
+
+    .icon-input-btn .glyphicon{
+
+        display: inline-block;
+        position: absolute;
+        left: 0.35em;
+        top: 30%;
+    }
+    </style>
+  {% endblock %}
+
+  {% block title %}
+    {{page_title}}
+  {% endblock %}
+
+  {% block content %}
+  {% if user.is_authenticated %}
+    {% if action_text == "Guardar" %}
+    <form id="scripts_form" action="" name="verify" method="post" enctype="multipart/form-data" class="form-horizontal col-md-12">
+      {% csrf_token %}
+      <div class="form-group col-sm-12">
+      <table>
+        <tr>
+          <td>
+            <label for="onTrigger1">En Trigger (Siempre):</label>
+          </td>
+          <td>
+            <input type="text" value="{{ onTrigger1 }}" {% if not onTrigger1 in scriptList %} class="text-danger" {% endif %} disabled>
+          </td>
+          <td>
+            <select name="onTrigger1">
+              {% for elem in scriptList %}
+                <option value="{{ elem }}" {% if elem == onTrigger1 %} selected="selected" {% endif %}>{{ elem }}</option>
+              {% endfor %}
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="onTrigger2">En Trigger (Ascensor):</label>
+          </td>
+          <td>
+            <input type="text" value="{{ onTrigger2 }}" {% if not onTrigger2 in scriptList %} class="text-danger" {% endif %} disabled>
+          </td>
+          <td>
+            <select name="onTrigger2">
+              {% for elem in scriptList %}
+                <option value="{{ elem }}" {% if elem == onTrigger2 %} selected="selected" {% endif %}>{{ elem }}</option>
+              {% endfor %}
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="onMaxTrigger1">En HardTrigger (Ascensor):</label>
+          </td>
+          <td>
+            <input type="text" value="{{ onMaxTrigger1 }}" {% if not onMaxTrigger1 in scriptList %} class="text-danger" {% endif %} disabled>
+          </td>
+          <td>
+            <select name="onMaxTrigger1">
+              {% for elem in scriptList %}
+                <option value="{{ elem }}" {% if elem == onMaxTrigger1 %} selected="selected" {% endif %}>{{ elem }}</option>
+              {% endfor %}
+            </select>
+          </td>
+        </tr>
+      </table>
+      <button type="submit" name="action" class="btn btn-default col-md-1" value="{{ action_text }}">
+        <span class="glyphicon glyphicon-floppy-disk submit-span" aria-hidden="true"></span> {{ action_text }}
+      </button>
+    </div>
+      <input type="hidden" id="this_url" name="this_url" value="{{ this_url }}">
+    </form>
+    {% else %}
+      <form role="form" method="post" action="/plot/signal/">
+        {% csrf_token %}
+        <div class="row">
+          <button type="submit" name="action" class="btn btn-default col-md-1" value="{{ action_text }}" onclick="disable_submit_span()">
+            <span class="glyphicon glyphicon-stop submit-span" aria-hidden="true"></span> {{ action_text }}
+          </button>
+          <input type="hidden" name="this_url" value="{{ this_url }}">
+        </div>
+      </form>
+      <br>
+      <p>Para hacer cambios, debe detener la aplicación primero.</p>
+    {% endif %}
+  {% else %}
+    Requiere iniciar sesión
+  {% endif %}
+{% endblock %}
+</html>

@@ -12,20 +12,62 @@
 </head>
 {% block content %}
 <body>
+  <script src="{% static "plot/js/index.js" %}"></script>
   <div>
-    <form action='/plot/result/' method="post" class="form">
-    {% csrf_token %}
-    {% if buffer %}
-    <select name="to_plot">
-      {% for b in buffer %}
-        <option value='{{b}}'>{{b}}</option>
-      {% endfor %}
-    </select>
-    <input type="submit" value="Plot">
-    {% endif %}
-    </form>
     {% if plot %}
   	<img src='{% url "img" data %}'/>
+    {% endif %}
+    {% if files_list %}
+      <form action='/download_multi_file/' method="post" class="form" id="multifile-form">
+        {% csrf_token %}
+        <input type="hidden" value='' id='files_array' name="files_array">
+        <button type="submit">
+          <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Descargar seleccionados
+        </button>
+      </form>
+      <button onclick="check_all()">
+        <span class="glyphicon glyphicon-check" aria-hidden="true"></span> Seleccionar todo
+      </button>
+      <button onclick="uncheck_all()">
+        <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> Deseleccionar todo
+      </button>
+      <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading"><b>Archivos Locales</b></div>
+        <!-- Table -->
+        <table class="table">
+          <thead>
+            <th><!-- Checkbox --></th>
+            <th>#</th>
+            <th>Archivo</th>
+            <th><!-- PlotButton --></th>
+            <th><!-- DownloadButton --></th>
+          </thead>
+          <tbody>
+            {% for b in files_list %}
+              <tr class="localfile-tr">
+                <td><input type="checkbox" name="selection-checkbox" value='{{b}}'></td>
+                <td>{{forloop.counter}}</td>
+                <td>{{b}}</td>
+                <td>
+                  <form action='/plot/result/' method="post" class="form">
+                    {% csrf_token %}
+                    <input type="hidden" value='{{b}}' name="to_plot">
+                    <input type="submit" value="Graficar">
+                  </form>
+                </td>
+                <td>
+                  <form action='/download_one_file/' method="post" class="form">
+                    {% csrf_token %}
+                    <input type="hidden" value='{{b}}' name="file">
+                    <input type="submit" value="Descargar">
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     {% endif %}
   </div>
 </body>

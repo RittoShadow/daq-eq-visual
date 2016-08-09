@@ -24,4 +24,6 @@ urlpatterns = [
     url(r'^$', views.home),
     url(r'^admin/', admin.site.urls),
     url(r'^plot/', include('plot.urls')),
+    url(r'^download_one_file/',views.download_one_file),
+    url(r'^download_multi_file/',views.download_multi_file),
 ]

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Django
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -6,27 +7,42 @@ from django.views.generic import FormView
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt,csrf_protect
 
+# Standard
 import matplotlib
-import subprocess
 matplotlib.use('Agg')
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+import subprocess
+import json
+import zipfile
+import StringIO
 import netifaces as net
 import plot
 import os
+from os.path import basename
 import io
 import re
 import time
 from PIL import Image
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 from models import configForm, notifyForm
 from command_client import *
 
+# Initializations
 daqeq_home = settings.DAQEQ_HOME
 
+@login_required(login_url="/plot/login/")
 def home(request):
+	"""
+	Vista de home
+	"""
 	return render(request, "plot/home.html", {})
 
 def loginDAQEQ(request):
+	"""
+	Login de app-web
+	"""
 	if request.method == "POST":
 	    username = request.POST['username']
 	    password = request.POST['password']
@@ -43,18 +59,26 @@ def loginDAQEQ(request):
 		return render(request, "registration/login.html", {})
 
 def logoutDAQEQ(request):
+	"""
+	Logout de app-web
+	"""
 	logout(request)
 	return render(request, "plot/home.html", {})
 
 @login_required(login_url="/plot/login/")
 def index(request):
+	"""
+	Datos de archivos .txt de daqeq
+	"""
 	files = sorted(map(lambda p : daqeq_home+'trunk/enviados/'+str(p), os.listdir(daqeq_home+'trunk/enviados')), key=os.path.getsize)
 	files = files + map(lambda p: daqeq_home+"trunk/"+str(p), os.listdir(daqeq_home+'trunk/'))
 	files = filter(lambda p : re.search("[\w_-]+TEST[\w_-]+\.txt",p),files)
-	return render(request, "plot/index.html", { "buffer" : files , "page_title" : "Seleccione un archivo:" })
-# Create your views here.
+	return render(request, "plot/index.html", { "files_list" : files , "page_title" : "" })
 
 def formatData(request):
+	"""
+	Graficar
+	"""
 	if request.method == "POST":
 		buff = request.POST["to_plot"]
 		if buff:
@@ -89,6 +113,9 @@ def parseConfigFile(request):
 	return {}
 
 def start_stop_signal(request):
+	"""
+	Iniciar o Detener daqeq c++
+	"""
 	import os, signal
 	# Obtener PID del proceso de app en c++ de daq-eq
 	pid = os.popen("pgrep 'RBA-DAQ-EQ'").read()
@@ -107,8 +134,9 @@ def start_stop_signal(request):
 		return redirect(request.POST["this_url"])
 
 def ask_daqeq_status():
-	import os
-
+	"""
+	Preguntar estado de app c++
+	"""
 	# Obtener PID del proceso de app en c++ de daq-eq
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
@@ -119,7 +147,7 @@ def ask_daqeq_status():
 	except ValueError:
 		result = -1
 	if result == 0:
-		return "Reiniciar"
+		return "Guardar"
 	elif result == 1:
 		return "Detener"
 	else:
@@ -129,10 +157,14 @@ def ask_daqeq_status():
 def view(request):
 	ip = net.ifaddresses('eth0')[2][0]['addr']
 	# ip = 'localhost'
-	return render(request, 'plot/views.html', { "this_url" : "/plot/views/", "ip" : ip})
+	return render(request, 'plot/views.html', { "this_url" : "/plot/views/", "ip" : ip, "running_status" : daqeq_is_running()})
 
+@csrf_exempt #This skips csrf validation. Use csrf_protect to have validation
 @login_required(login_url="/plot/login/")
 def sensor(request):
+	"""
+	Actualizar sensores, o agregar manualmente en vista de config
+	"""
 	if request.POST['command'] == 'refresh':
 		ans = command_server("elg")
 		print "Refresh"
@@ -142,8 +174,99 @@ def sensor(request):
 	sensor = command_server("cag")
 	return JsonResponse(sensor, safe=False)
 
+@csrf_exempt #This skips csrf validation. Use csrf_protect to have validation
+@login_required(login_url="/plot/login/")
+def download_one_file(request):
+	"""
+	Descargar un archivo
+	"""
+	file_path = request.POST['file']
+	response = HttpResponse(file(file_path))
+	response['Content-Type'] = 'application/force-download'
+	response['Content-Length'] = os.path.getsize(file_path)
+	response['Content-Disposition'] = 'attachment; filename=\"' + basename(file_path) + '\"'
+	response['Accept-Ranges'] = 'bytes'
+	return response
+
+@csrf_exempt #This skips csrf validation. Use csrf_protect to have validation
+@login_required(login_url="/plot/login/")
+def download_multi_file(request):
+	"""
+	Descargar varios archivos, en un archivo comprimido con fecha en nombre
+	"""
+	filenames = json.loads(request.POST['files_array'])
+	zip_subdir = "daqeq_files-" + (time.strftime("%d-%m-%Y_%H-%M-%S"))
+	zip_filename = "%s.zip" % zip_subdir
+	s = StringIO.StringIO()
+	zf = zipfile.ZipFile(s, "w")
+
+	for fpath in filenames:
+		fdir, fname = os.path.split(fpath)
+		zip_path = os.path.join(zip_subdir, fname)
+		zf.write(fpath, zip_path)
+
+	zf.close()
+	response = HttpResponse(s.getvalue(), content_type = "application/x-zip-compressed")
+	response['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
+	return response
+
+@login_required(login_url="/plot/login/")
+def notificationVerification(request):
+	"""
+	Guardar configuraciones hechas en notification
+	"""
+	route = settings.BASE_DIR+"/plot"
+	os.chdir(route)
+	if request.method == "POST":
+		if request.POST["this_url"] == "/plot/notification/":
+			if "sendFrequency" in request.POST:
+				command_server("nss",request.POST["sendFrequency"])
+			if "verificationFrequency" in request.POST:
+				command_server("nos",request.POST["verificationFrequency"])
+			if "username" in request.POST:
+				command_server("sis",request.POST["username"])
+			if "password" in request.POST:
+				command_server("sps",request.POST["password"])
+			if "structure" in request.POST:
+				command_server("sss",request.POST["structure"])
+			if "email" in request.POST:
+				command_server("ses",request.POST["email"])
+			if "phoneNumber" in request.POST:
+				command_server("sts",request.POST["phoneNumber"])
+			if "authenticationURL" in request.POST:
+				command_server("sas",request.POST["authenticationURL"])
+			if "recordURL" in request.POST:
+				command_server("srs",request.POST["recordURL"])
+			if "structHealthURL" in request.POST:
+				command_server("shs",request.POST["structHealthURL"])
+			if "sendSMS" in request.POST:
+				command_server("emst")
+			else:
+				command_server("emsf")
+			if "sendRecord" in request.POST:
+				command_server("esst")
+			else:
+				command_server("essf")
+			if "compressRecord" in request.POST:
+				command_server("ecst")
+			else:
+				command_server("ecsf")
+			if "sendStructHealth" in request.POST:
+				command_server("ehst")
+			else:
+				command_server("ehsf")
+			command_server("1")
+			messages.success(request, 'Se han guardado los cambios en las notificaciones.')
+			return redirect(view)
+		else:
+			return request
+	return redirect(request.POST["this_url"])
+
 @login_required(login_url="/plot/login/")
 def configVerification(request):
+	"""
+	Guardar configuraciones hechas en config
+	"""
 	route = settings.BASE_DIR+"/plot"
 	os.chdir(route)
 	if request.method == "POST":
@@ -169,34 +292,48 @@ def configVerification(request):
 				# 	command_server("nts",request.POST["secondTriggerThresh"])
 			else:
 				command_server("ensf")
-			if request.POST["graphWindow"]:
+			if "graphWindow" in request.POST:
 				command_server("ngs",request.POST["graphWindow"])
-			if request.POST["filterWindow"]:
+			if "filterWindow" in request.POST:
 				command_server("nfs",request.POST["filterWindow"])
-			if request.POST["preEventTime"]:
+			if "preEventTime" in request.POST:
 				command_server("nas",request.POST["preEventTime"])
-			if request.POST["postEventTime"]:
+			if "postEventTime" in request.POST:
 				command_server("nbs",request.POST["postEventTime"])
-			if request.POST["minTimeRunning"]:
+			if "minTimeRunning" in request.POST:
 				command_server("nms",request.POST["minTimeRunning"])
-			if request.POST["votes"]:
+			if "votes" in request.POST:
 				command_server("nvs",request.POST["votes"])
-			if request.POST["recordLength"]:
+			if "recordLength" in request.POST:
 				command_server("nrs",request.POST["recordLength"])
-			if request.POST["portNumber"]:
+			if "portNumber" in request.POST:
 				command_server("nps",request.POST["portNumber"])
-			if request.POST["filenameFormat"]:
+			if "filenameFormat" in request.POST:
 				command_server("sfs",request.POST["filenameFormat"])
-			if request.POST["serverURL"]:
+			if "serverURL" in request.POST:
 				command_server("sus",request.POST["serverURL"])
-			if request.POST["networkName"]:
+			if "networkName" in request.POST:
 				command_server("sns",request.POST["networkName"])
-			if request.POST["outputDir"]:
+			if "outputDir" in request.POST:
 				command_server("sos",request.POST["outputDir"])
-			if request.POST["username"]:
+			if "username" in request.POST:
 				command_server("sis",request.POST["username"])
-			if request.POST["password"]:
+			if "password" in request.POST:
 				command_server("sps",request.POST["password"])
+			if "detriggerObservationTime_m" in request.POST:
+				if "detriggerObservationTime_s" in request.POST:
+					request.POST["detriggerObservationTime_s"] = repr(int(request.POST["detriggerObservationTime_s"]) + (int(request.POST["detriggerObservationTime_m"]) * 60))
+				else:
+					request.POST["detriggerObservationTime_s"] = repr(int(request.POST["detriggerObservationTime_m"]) * 60)
+			if "detriggerObservationTime_s" in request.POST:
+				command_server("nds",request.POST["detriggerObservationTime_s"])
+			if "releLiberationTime_m" in request.POST:
+				if "releLiberationTime_s" in request.POST:
+					request.POST["releLiberationTime_s"] = repr(int(request.POST["releLiberationTime_s"]) + (int(request.POST["releLiberationTime_m"]) * 60))
+				else:
+					request.POST["releLiberationTime_s"] = repr(int(request.POST["releLiberationTime_m"]) * 60)
+			if "releLiberationTime_s" in request.POST:
+				command_server("nls",request.POST["releLiberationTime_s"])
 			listSensorParams = []
 			if request.POST.getlist("serialNum"):
 				for i in range(len(request.POST.getlist("serialNum"))):
@@ -241,51 +378,18 @@ def configVerification(request):
 					if len(sensorParams.split(";"))==18:
 						listSensorParams.append(sensorParams)
 			command_server("cas",listSensorParams)
-			command_server("0")
-		elif request.POST["this_url"] == "/plot/notification/":
-			if request.POST["sendFrequency"]:
-				command_server("nss",request.POST["sendFrequency"])
-			if request.POST["verificationFrequency"]:
-				command_server("nos",request.POST["verificationFrequency"])
-			if request.POST["username"]:
-				command_server("sis",request.POST["username"])
-			if request.POST["password"]:
-				command_server("sps",request.POST["password"])
-			if request.POST["structure"]:
-				command_server("sss",request.POST["structure"])
-			if request.POST["email"]:
-				command_server("ses",request.POST["email"])
-			if request.POST["phoneNumber"]:
-				command_server("sts",request.POST["phoneNumber"])
-			if request.POST["authenticationURL"]:
-				command_server("sas",request.POST["authenticationURL"])
-			if request.POST["recordURL"]:
-				command_server("srs",request.POST["recordURL"])
-			if request.POST["structHealthURL"]:
-				command_server("shs",request.POST["structHealthURL"])
-			if "sendSMS" in request.POST:
-				command_server("emst")
-			else:
-				command_server("emsf")
-			if "sendRecord" in request.POST:
-				command_server("esst")
-			else:
-				command_server("essf")
-			if "compressRecord" in request.POST:
-				command_server("ecst")
-			else:
-				command_server("ecsf")
-			if "sendStructHealth" in request.POST:
-				command_server("ehst")
-			else:
-				command_server("ehsf")
-			command_server("0")
+			command_server("1")
+			messages.success(request, 'Se han guardado los cambios en configuraciones.')
+			return redirect(view)
 		else:
 			return request
 	return redirect(request.POST["this_url"])
 
 class ConfigurationFormView(FormView):
-	template_name = 'plot/notification.html'
+	"""
+	Datos de vista de configuraciones
+	"""
+	template_name = 'plot/config.html'
 	form_class = configForm
 
 	def __init__(self, *args, **kwargs):
@@ -319,6 +423,20 @@ class ConfigurationFormView(FormView):
 			self.initial['outputDir'] = command_server("sog")
 			self.initial["username"] = command_server("sig")
 			self.initial["password"] = command_server("spg")
+			detrigger_obs_time_seconds = int(command_server("ndg"))
+			detrigger_obs_time_minutes = int(detrigger_obs_time_seconds/60)
+			detrigger_obs_time_seconds = detrigger_obs_time_seconds - (detrigger_obs_time_minutes * 60)
+			self.initial["detriggerObservationTime_m"] = detrigger_obs_time_minutes
+			self.initial["detriggerObservationTime_s"] = detrigger_obs_time_seconds
+			rele_lib_time_seconds = int(command_server("nlg"))
+			rele_lib_time_minutes = int(rele_lib_time_seconds/60)
+			rele_lib_time_seconds = rele_lib_time_seconds - (rele_lib_time_minutes * 60)
+			self.initial["releLiberationTime_m"] = rele_lib_time_minutes
+			self.initial["releLiberationTime_s"]= rele_lib_time_seconds
+			if command_server("eng") == "1":
+				self.initial['enableSecondTrigger'] = 'on'
+			else:
+				self.initial['enableSecondTrigger'] = None
 		super(ConfigurationFormView, self).__init__(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
@@ -328,14 +446,13 @@ class ConfigurationFormView(FormView):
 		context["action_text"] = ask_daqeq_status()
 		command_server("elg")
 		context["sensors"] = command_server("cag")
-		if command_server("eng") == "1":
-			context["secondTrigger"] = True
-		else:
-			context["secondTrigger"] = False
 		return context
 
 
 class NotificationFormView(FormView):
+	"""
+	Datos de vista de notificaciones
+	"""
 	template_name = 'plot/notification.html'
 	form_class = notifyForm
 
@@ -378,3 +495,45 @@ class NotificationFormView(FormView):
 		context["this_url"] = "/plot/notification/"
 		context["action_text"] = ask_daqeq_status()
 		return context
+
+@login_required(login_url="/plot/login/")
+def scriptConfiguration(request):
+	"""
+	Configuraciones de Scripts
+	"""
+	if request.method == 'POST':
+		# Si es POST, guardar data
+		if request.POST["this_url"] == "plot/script_configuration":
+			print "TEST"
+			if "onTrigger1" in request.POST:
+				command_server("sat1s",request.POST["onTrigger1"])
+			if "onTrigger2" in request.POST:
+				command_server("sat2s",request.POST["onTrigger2"])
+			if "onMaxTrigger1" in request.POST:
+				command_server("sam1s",request.POST["onMaxTrigger1"])
+			command_server("1")
+			messages.success(request, 'Se han guardado los cambios en los scripts.')
+			return redirect(view)
+		messages.error(request, 'No se han guardado los cambios en los scripts.')
+	if daqeq_is_running() == False:
+		onTrigger1 = command_server("sat1g")
+		onTrigger2 = command_server("sat2g")
+		onMaxTrigger1 = command_server("sam1g")
+		scriptList = command_server("csg")
+		# scriptList = scriptList[-1:] + scriptList[:-1]
+		scriptList = scriptList[:-1]
+	else:
+		onTrigger1 = onTrigger2 = onMaxTrigger1 = scriptList = ""
+	parameters = {
+		# contexto
+		"page_title" : "Scripts",
+		"this_url" : "plot/script_configuration",
+		"action_text" : ask_daqeq_status(),
+		# Valores iniciales
+		'onTrigger1' : onTrigger1,
+		'onTrigger2' : onTrigger2,
+		'onMaxTrigger1' : onMaxTrigger1,
+		# Lista de Scripts
+		'scriptList' : scriptList
+	}
+	return render(request, 'plot/script_configuration.html', parameters)
