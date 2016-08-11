@@ -131,11 +131,12 @@
           <button type="submit" name="action" class="btn btn-default col-md-1" value="{{action_text}}" onclick="disable_submit_span()">
             <span class="glyphicon glyphicon-stop submit-span" aria-hidden="true"></span> {{action_text}}
           </button>
+          <input type="hidden" name="is_stopping" value="true">
           <input type="hidden" name="this_url" value="{{this_url}}">
         </div>
       </form>
       <br>
-      <p>Para hacer cambios, debe detener la aplicación primero.</p>
+      <p id='config_status_msg'>Para hacer cambios, debe detener la aplicación primero.</p>
     {% endif %}
   {% else %}
   Requiere iniciar sesión

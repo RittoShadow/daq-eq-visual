@@ -11,6 +11,7 @@ urlpatterns = [
 	 url(r'^image/(?P<data>.+)', views.newPlot, name='img'),
 	 url(r'^chart/', views.subscribe, name='chart'),
 	 url(r'^config/', views.ConfigurationFormView.as_view(), name='config'),
+	#  url(r'^config/', views.ConfigurationFormView, name='config'),
 	 url(r'^notification/', views.NotificationFormView.as_view(), name='notify'),
 	 url(r'^signal/', views.start_stop_signal, name='signal'),
 	 url(r'^views/', views.view, name="view"),

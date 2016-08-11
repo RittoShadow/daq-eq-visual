@@ -54,7 +54,7 @@ class configForm(ModelForm):
         model = Configuration
         fields = '__all__'
         labels = {
-            'enableFilteredVisualization': _('Visualizar Data Filtrada'),
+            'enableFilteredVisualization': _('Guardar Data Filtrada'),
             'graphWindow': _('Ventana de gráfico:'),
             'filterWindow': _('Ventana de filtro:'),
             'preEventTime': _('Pre-evento:'),

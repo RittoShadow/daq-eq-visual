@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt,csrf_protect
+from django.forms import formset_factory
 
 # Standard
 import matplotlib
@@ -389,6 +390,70 @@ def configVerification(request):
 		else:
 			return request
 	return redirect(request.POST["this_url"])
+
+# @login_required(login_url="/plot/login/")
+# def ConfigurationFormView(request):
+# 	form =configForm
+# 	view_data = {
+# 	'form': form,
+# 	'action_text': ask_daqeq_status(),
+# 	'page_title': "Configuración",
+# 	'this_url': "/plot/config/",
+# 	'sensors': command_server("cag")
+# 	}
+# 	if request.method == "POST":
+# 		print "POST_METHOD"
+# 		if "is_stopping" in request.POST:
+# 			message.success("La aplicación fue detenida exitosamente")
+#
+# 	if daqeq_is_running() == False:
+# 		print "is_not_running"
+# 		if command_server("eag") == "1":
+# 			view_data['enableAutoStart'] = 'on'
+# 		else:
+# 			view_data['enableAutoStart'] = None
+# 		if command_server("etg") == "1":
+# 			view_data['enableTrigger'] = 'on'
+# 		else:
+# 			view_data['enableTrigger'] = None
+# 		if command_server("erg") == "1":
+# 			view_data['enableRecording'] = 'on'
+# 		else:
+# 			view_data['enableRecording'] = None
+# 		if command_server("evg") == "1":
+# 			view_data['enableFilteredVisualization'] = 'on'
+# 		else:
+# 			view_data['enableFilteredVisualization'] = None
+# 		view_data['graphWindow'] = command_server("ngg")
+# 		view_data['filterWindow'] = command_server("nfg")
+# 		view_data['preEventTime'] = command_server("nag")
+# 		view_data['postEventTime'] = command_server("nbg")
+# 		view_data['minTimeRunning'] = command_server("nmg")
+# 		view_data['votes'] = command_server("nvg")
+# 		view_data['recordLength'] = command_server("nrg")
+# 		view_data['portNumber'] = command_server("npg")
+# 		view_data['filenameFormat'] = command_server("sfg")
+# 		view_data['serverURL'] = command_server("sug")
+# 		view_data['networkName'] = command_server("sng")
+# 		view_data['outputDir'] = command_server("sog")
+# 		view_data["username"] = command_server("sig")
+# 		view_data["password"] = command_server("spg")
+# 		detrigger_obs_time_seconds = int(command_server("ndg"))
+# 		detrigger_obs_time_minutes = int(detrigger_obs_time_seconds/60)
+# 		detrigger_obs_time_seconds = detrigger_obs_time_seconds - (detrigger_obs_time_minutes * 60)
+# 		view_data["detriggerObservationTime_m"] = detrigger_obs_time_minutes
+# 		view_data["detriggerObservationTime_s"] = detrigger_obs_time_seconds
+# 		rele_lib_time_seconds = int(command_server("nlg"))
+# 		rele_lib_time_minutes = int(rele_lib_time_seconds/60)
+# 		rele_lib_time_seconds = rele_lib_time_seconds - (rele_lib_time_minutes * 60)
+# 		view_data["releLiberationTime_m"] = rele_lib_time_minutes
+# 		view_data["releLiberationTime_s"]= rele_lib_time_seconds
+# 		if command_server("eng") == "1":
+# 			view_data['enableSecondTrigger'] = 'on'
+# 		else:
+# 			view_data['enableSecondTrigger'] = None
+#
+# 	return render(request, 'plot/config.html', view_data)
 
 class ConfigurationFormView(FormView):
 	"""

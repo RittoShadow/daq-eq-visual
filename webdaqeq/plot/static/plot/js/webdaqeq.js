@@ -20,6 +20,7 @@ function disable_submit_span() {
   $('.submit-span').attr('old-class', $('.submit-span').attr('class'));
   $('.submit-span').attr('class', "glyphicon glyphicon-hourglass submit-span");
   $(".submit-span").parent().prop("disabled", true);
+  $('#config_status_msg').html('Espere por favor, deteniendo aplicación.');
 }
 
 // Habilitar button perteneciente a un span, y recuperar icono
