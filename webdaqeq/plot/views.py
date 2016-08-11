@@ -49,8 +49,9 @@ def loginDAQEQ(request):
 	    user = authenticate(username=username, password=password)
 	    if user is not None:
 	        if user.is_active:
-	            login(request, user)
-	            return render(request, "plot/home.html", { "page_title" : "Bienvenido, "+username , "page_content" : "Has iniciado sesión."})
+				login(request, user)
+				messages.success(request, 'Saludos ' + username + '. Ha ingresado al sistema correctamente.')
+				return redirect(view)
 	        else:
 	            return render(request, "plot/home.html", { "page_title" : "Bienvenido, intruso" , "page_content" : "No has iniciado sesión."})
 	    else:
