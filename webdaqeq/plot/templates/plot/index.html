@@ -16,8 +16,7 @@
   <div>
     {% if plot %}
   	<img src='{% url "img" data %}'/>
-    {% endif %}
-    {% if files_list %}
+    {% elif files_list %}
       <form action='/download_multi_file/' method="post" class="form" id="multifile-form">
         {% csrf_token %}
         <input type="hidden" value='' id='files_array' name="files_array">
@@ -68,6 +67,8 @@
           </tbody>
         </table>
       </div>
+    {% else %}
+      No hay archivos locales para mostrar.
     {% endif %}
   </div>
 </body>
